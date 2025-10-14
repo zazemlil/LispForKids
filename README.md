@@ -1,14 +1,6 @@
-# Haskell Subset Translator
+# LispForKids
 
-C++ translator for a subset of Haskell language syntax with flex & bison.
-
-## Features
-
-- Lexical analysis
-- Syntactic analysis (lalr1)
-- Abstract Syntax Tree generation
-- Basic Haskell syntax support
-- Cross-platform (Linux/Windows)
+C++ translator of LispKit subset with flex & bison.
 
 ## Requirements
 
