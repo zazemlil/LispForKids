@@ -12,56 +12,28 @@ void set_input_file(yyscan_t scanner, const char* filename);
 
 %%
 
-"-" { return Parser::token::T_ARITHMETIC_OP_MINUS; }
-"+" { return Parser::token::T_ARITHMETIC_OP_PLUS; }
-"*" { return Parser::token::T_ARITHMETIC_OP_MULTIPLY; }
-"/" { return Parser::token::T_ARITHMETIC_OP_DIVIDE; }
+"QUOTE"|"quote"    { return Parser::token::T_QUOTE; }
+"CAR"|"car"        { return Parser::token::T_CAR; }
+"CDR"|"cdr"        { return Parser::token::T_CDR; }
+"CONS"|"cons"      { return Parser::token::T_CONS; }
+"ATOM"|"atom"      { return Parser::token::T_ATOM; }
+"EQUAL"|"equal"    { return Parser::token::T_EQUAL; }
+"ADD"|"add"        { return Parser::token::T_ADD; }
+"SUB"|"sub"        { return Parser::token::T_SUB; }
+"MUL"|"mul"        { return Parser::token::T_MUL; }
+"DIV"|"div"        { return Parser::token::T_DIV; }
+"REM"|"rem"        { return Parser::token::T_REM; }
+"LEQ"|"leq"        { return Parser::token::T_LEQ; }
+"COND"|"cond"      { return Parser::token::T_COND; }
+"LAMBDA"|"lambda"  { return Parser::token::T_LAMBDA; }
+"LET"|"let"        { return Parser::token::T_LET; }
+"LETREC"|"letrec"  { return Parser::token::T_LETREC; }
 
-"||" { return Parser::token::T_LOGIC_OP_OR; }
-"&&" { return Parser::token::T_LOGIC_OP_AND; }
-"==" { return Parser::token::T_LOGIC_OP_EQUAL; }
-"<=" { return Parser::token::T_LOGIC_OP_LESS_OR_EQUAL; }
-">=" { return Parser::token::T_LOGIC_OP_MORE_OR_EQUAL; }
-"/=" { return Parser::token::T_LOGIC_OP_NOT_EQUAL; }
-"<" { return Parser::token::T_LOGIC_OP_LESS; }
-">" { return Parser::token::T_LOGIC_OP_MORE; }
-
-"=" { return Parser::token::T_ASSIGNMENT; }
-
-"Int"  { return Parser::token::T_TYPE_INT; }
-"Float"  { return Parser::token::T_TYPE_FLOAT; }
-"Char"  { return Parser::token::T_TYPE_CHAR; }
-"Bool"  { return Parser::token::T_TYPE_BOOLEAN; }
-
-"True"  { return Parser::token::T_LITERAL_BOOLEAN_TRUE; }
-"False"  { return Parser::token::T_LITERAL_BOOLEAN_FALSE; }
-
-"if"  { return Parser::token::T_IF; }
-"then"  { return Parser::token::T_THEN; }
-"else"  { return Parser::token::T_ELSE; }
-"let"  { return Parser::token::T_LET; }
-"in"  { return Parser::token::T_IN; }
-"data"  { return Parser::token::T_DATA; }
-
-\\ { return Parser::token::T_LAMBDA; }
-"->" { return Parser::token::T_ARROW_RIGHT; }
-"<-" { return Parser::token::T_ARROW_LEFT; }
-"_" { return Parser::token::T_UNDERSCORE; }
-"|" { return Parser::token::T_DEVIDING_LINE; }
-"," { return Parser::token::T_COMMA; }
-"::" { return Parser::token::T_COLON_DOUBLE; }
-":" { return Parser::token::T_COLON; }
-"'" { return Parser::token::T_SINGLE_QUOTE; }
 "(" { return Parser::token::T_PARENTHESIS_OPEN; }
 ")" { return Parser::token::T_PARENTHESIS_CLOSE; }
-"[" { return Parser::token::T_BRACKET_OPEN; }
-"]" { return Parser::token::T_BRACKET_CLOSE; }
 
-[a-z][a-zA-z|0-9]* { yylval->emplace<std::string>(std::string(yytext, yyleng)); return Parser::token::T_IDENTIFIER; }
-[A-Z][a-zA-z|0-9]* { yylval->emplace<std::string>(std::string(yytext, yyleng)); return Parser::token::T_TYPE_CONSTRUCTOR; }
-[0-9]+ { yylval->emplace<int>(atoi(yytext)); return Parser::token::T_LITERAL_INT; }
-[0-9]+"."[0-9]+ { yylval->emplace<float>(atof(yytext)); return Parser::token::T_LITERAL_FLOAT; }
-"'"[a-zA-z|0-9]"'" { yylval->emplace<char>(yytext[1]); return Parser::token::T_LITERAL_CHAR; }
+[a-zA-z][a-zA-z|0-9]* { yylval->emplace<std::string>(std::string(yytext, yyleng)); return Parser::token::T_IDENTIFIER; }
+[+-]?[0-9]+ { yylval->emplace<int>(atoi(yytext)); return Parser::token::T_LITERAL_INT; }
 
 [ \t\n\r ]
 
