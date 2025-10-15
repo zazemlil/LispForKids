@@ -33,7 +33,7 @@ void set_input_file(yyscan_t scanner, const char* filename);
 ")" { return Parser::token::T_PARENTHESIS_CLOSE; }
 
 [a-zA-z][a-zA-z|0-9]* { yylval->emplace<std::string>(std::string(yytext, yyleng)); return Parser::token::T_IDENTIFIER; }
-[+-]?[0-9]+ { yylval->emplace<int>(atoi(yytext)); return Parser::token::T_LITERAL_INT; }
+[-]?[0-9]+ { yylval->emplace<int>(atoi(yytext)); return Parser::token::T_LITERAL_INT; }
 
 [ \t\n\r ]
 

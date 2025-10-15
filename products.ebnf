@@ -1,0 +1,32 @@
+S -> EXPR
+
+EXPR -> ATOM
+        | "(" LIST ")"
+        | "(" APPLICATION ")"
+
+ATOM -> id | num
+
+LIST -> EXPR LIST`
+LIST` -> EXPR LIST`
+        | ε
+
+APPLICATION -> OP1 EXPR
+        | OP2 EXPR EXPR
+        | "cond" EXPR EXPR EXPR
+        | "lambda" "(" PARAMS ")" EXPR
+        | "let" BINDINGS EXPR
+        | "letrec" BINDINGS EXPR
+
+OP1 -> "quote" | "car" | "cdr" | "atom"
+OP2 -> "add" | "sub" | "mul" | "div" | "rem" | "leq" | "cons" | "equal"
+
+PARAMS -> id PARAMS
+        | ε
+
+BINDINGS -> BIND BINDINGS`
+BINDINGS` -> BIND BINDINGS`
+        | ε
+BIND -> "(" id EXPR ")"
+
+num -> [-]?[0-9]+ 
+id  -> [a-zA-z][a-zA-z|0-9]*
