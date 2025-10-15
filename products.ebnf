@@ -14,8 +14,8 @@ APPLICATION -> OP1 EXPR
         | OP2 EXPR EXPR
         | "cond" EXPR EXPR EXPR
         | "lambda" "(" PARAMS ")" EXPR
-        | "let" BINDINGS EXPR
-        | "letrec" BINDINGS EXPR
+        | "let" EXPR BINDINGS 
+        | "letrec" EXPR BINDINGS 
 
 OP1 -> "quote" | "car" | "cdr" | "atom"
 OP2 -> "add" | "sub" | "mul" | "div" | "rem" | "leq" | "cons" | "equal"
@@ -30,5 +30,3 @@ BIND -> "(" id EXPR ")"
 
 num -> [-]?[0-9]+ 
 id  -> [a-zA-z][a-zA-z|0-9]*
-
-# после bindings в let может быть несколько EXPR
