@@ -7,7 +7,9 @@ void set_input_file(yyscan_t scanner, const char* filename);
 
 %}
 
-%option reentrant batch noyywrap noyylineno nodefault outfile="Scanner.cpp" header="Scanner.hpp"
+%option yylineno
+
+%option reentrant batch noyywrap nodefault outfile="Scanner.cpp" header="Scanner.hpp"
 
 %%
 

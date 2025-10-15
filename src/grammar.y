@@ -88,7 +88,16 @@ bind: T_PARENTHESIS_OPEN T_IDENTIFIER expr T_PARENTHESIS_CLOSE {};
 %%
 
 void lisp_for_kids::Parser::error(const std::string& msg) {
+    /* const char* text = yyget_text(scanner);
+    int length = yyget_leng(scanner);
+    std::cerr << msg << " at token: '" << std::string(text, length) << "'\n"; */
     const char* text = yyget_text(scanner);
     int length = yyget_leng(scanner);
-    std::cerr << msg << " at token: '" << std::string(text, length) << "'\n";
+    int line = yyget_lineno(scanner);
+    int column = yyget_column(scanner); 
+        
+    std::cerr << "Error at line " << line << ", column " << column 
+                << ": " << msg 
+                << "\nLast token: '" << std::string(text, length) << "'" 
+                << std::endl;
 }
