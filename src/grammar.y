@@ -38,7 +38,7 @@
 
 %token T_END_OF_FILE
 
-%type <std::unique_ptr<syntax_tree::ASTNode>> s expr atom list listTail application op1 op2 params bindings bindingsTail bind
+%type <std::unique_ptr<syntax_tree::ASTNode>> s expr atom list application op1 op2 params bindings bindingsTail bind
 
 %%
 
@@ -55,10 +55,9 @@ expr: atom {}
 atom: T_IDENTIFIER {}
     | T_LITERAL_INT {};
 
-list: expr listTail {};
-listTail: expr listTail {}
+list: expr list {}
     | %empty {};
-
+    
 application: op1 expr {}
     | op2 expr expr {}
     | T_COND expr expr expr {}

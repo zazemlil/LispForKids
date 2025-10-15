@@ -1,1 +1,13 @@
-!( A B C )
+(let
+     (del a b)
+     (del 
+          (lambda (x y)
+               (cons 
+                    (dive x y) 
+                    ( cons(rem x y) (quote()) )
+               )
+          )
+     )
+     (a (quote 1))
+     (b (quote 2))
+)

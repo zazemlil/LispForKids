@@ -6,8 +6,7 @@ EXPR -> ATOM
 
 ATOM -> id | num
 
-LIST -> EXPR LIST`
-LIST` -> EXPR LIST`
+LIST -> EXPR LIST
         | ε
 
 APPLICATION -> OP1 EXPR
