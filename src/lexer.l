@@ -21,9 +21,9 @@ void set_input_file(yyscan_t scanner, const char* filename);
 [aA][dD][dD]             { yylval->emplace<std::string>("ADD"); return Parser::token::T_ADD; }
 [sS][uU][bB]             { yylval->emplace<std::string>("SUB"); return Parser::token::T_SUB; }
 [mM][uU][lL]             { yylval->emplace<std::string>("MUL"); return Parser::token::T_MUL; }
-[dD][iI][vV][eE]         { yylval->emplace<std::string>("DIVE"); return Parser::token::T_DIV; }
+[dD][iI][vV][eE]         { yylval->emplace<std::string>("DIVE"); return Parser::token::T_DIVE; }
 [rR][eE][mM]             { yylval->emplace<std::string>("REM"); return Parser::token::T_REM; }
-[lL][eE]                 { yylval->emplace<std::string>("LE"); return Parser::token::T_LEQ; }
+[lL][eE]                 { yylval->emplace<std::string>("LE"); return Parser::token::T_LE; }
 [cC][oO][nN][dD]         { yylval->emplace<std::string>("COND"); return Parser::token::T_COND; }
 [lL][aA][mM][bB][dD][aA] { yylval->emplace<std::string>("LAMBDA"); return Parser::token::T_LAMBDA; }
 [lL][eE][tT]             { yylval->emplace<std::string>("LET"); return Parser::token::T_LET; }
@@ -38,7 +38,7 @@ void set_input_file(yyscan_t scanner, const char* filename);
 [ \t\n\r ]
 
 <<EOF>> { return Parser::token::T_END_OF_FILE; }
-. {}
+. { return yytext[0]; }
 
 %%
 
