@@ -8,12 +8,14 @@ namespace syntax_tree {
 
 class ASTNode {
 private:
-    std::string text;
-    std::vector<std::unique_ptr<ASTNode>> statements; 
+    std::string node_type;
+    std::vector<std::unique_ptr<ASTNode>> statements;
 
 public:
     ASTNode() {}
-    ASTNode(std::string t) : text(t) {}
+    ASTNode(std::string t) : node_type(t) {}
+    
+    virtual ~ASTNode() = default;
 
     void addStatement(std::unique_ptr<ASTNode> stmt) {
         statements.push_back(std::move(stmt));
@@ -27,11 +29,15 @@ public:
         return statements.at(index).get(); 
     }
 
+    virtual void printValue() const {}
+
     void print(int indent = 0) const {
         std::string indentStr = "|";
         for (int i = 0; i < indent-1; i++) {indentStr += "    |";}
         
-        std::cout << indentStr << "--- " << text << "\n";
+        std::cout << indentStr << "--- " << node_type << " ";
+        this->printValue();
+        std::cout << '\n';
         
         for (const auto& stmt : statements) {
             stmt->print(indent + 2);
@@ -39,6 +45,27 @@ public:
     }
 };
 
+class LiteralInt : public ASTNode {
+    int value;
+
+public:
+    void printValue() const override {
+        std::cout << "(value = " << value << ")";
+    }
+
+    LiteralInt(std::string t, int v) : ASTNode(t), value(v) {}
+};
+
+class Identifier : public ASTNode {
+    std::string value;
+
+public:
+    void printValue() const override {
+        std::cout << "(value = " << value << ")";
+    }
+
+    Identifier(std::string t, std::string v) : ASTNode(t), value(v) {}
+};
 
 class AST {
 private:
@@ -63,4 +90,3 @@ public:
 };
 
 };
-

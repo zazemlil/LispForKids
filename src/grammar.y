@@ -43,7 +43,7 @@
 %%
 
 s: expr T_END_OF_FILE {
-    std::unique_ptr<syntax_tree::ASTNode> test = std::make_unique<syntax_tree::ASTNode>("testNode"); 
+    std::unique_ptr<syntax_tree::ASTNode> test = std::make_unique<syntax_tree::LiteralInt>("testNode", 12); 
     result = syntax_tree::AST(std::move(test));
     YYACCEPT;
 };
