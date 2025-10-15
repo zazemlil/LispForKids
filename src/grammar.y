@@ -1,8 +1,4 @@
 %{
-#include <iostream>
-#include <memory>
-#include <string>
-#include <cmath>
 #include "Scanner.hpp"
 %}
 
@@ -38,23 +34,56 @@
 
 %token T_END_OF_FILE
 
-%type <std::unique_ptr<syntax_tree::ASTNode>> expr
+%type <std::unique_ptr<syntax_tree::ASTNode>> s expr atom list listTail application op1 op2 params bindings bindingsTail bind
 
 %%
 
-program: expr T_CAR T_IDENTIFIER T_LITERAL_INT T_END_OF_FILE {
-    //($1)->print(0);
-    result = syntax_tree::AST(std::move($1));
-    std::cout << $2 << "\n";
-    std::cout << $3 << "\n";
-    std::cout << $4 << "\n";
-    std::cout << "Success!" << std::endl;
+s: expr T_END_OF_FILE {
+    std::unique_ptr<syntax_tree::ASTNode> test = std::make_unique<syntax_tree::ASTNode>("testNode"); 
+    result = syntax_tree::AST(std::move(test));
     YYACCEPT;
 };
 
-expr: %empty {
-    $$ = std::make_unique<syntax_tree::ASTNode>("testNode");
-};
+expr: atom {}
+    | T_PARENTHESIS_OPEN list T_PARENTHESIS_CLOSE {}
+    | T_PARENTHESIS_OPEN application T_PARENTHESIS_CLOSE {};
+
+atom: T_IDENTIFIER {}
+    | T_LITERAL_INT {};
+
+list: expr listTail {};
+listTail: expr listTail {}
+    | %empty {};
+
+application: op1 expr {}
+    | op2 expr expr {}
+    | T_COND expr expr expr {}
+    | T_LAMBDA T_PARENTHESIS_OPEN params T_PARENTHESIS_CLOSE expr {}
+    | T_LET expr bindings {}
+    | T_LETREC expr bindings {};
+
+op1: T_QUOTE {}
+    | T_CAR {}
+    | T_CDR {}
+    | T_ATOM {};
+
+op2: T_ADD {}
+    | T_SUB {}
+    | T_MUL {}
+    | T_DIVE {}
+    | T_REM {}
+    | T_LE {}
+    | T_CONS {}
+    | T_EQUAL {};
+
+params: T_IDENTIFIER params {}
+    | %empty {};
+
+bindings: bind bindingsTail {};
+bindingsTail: bind bindingsTail {}
+    | %empty {};
+
+bind: T_PARENTHESIS_OPEN T_IDENTIFIER expr T_PARENTHESIS_CLOSE {};
 
 %%
 

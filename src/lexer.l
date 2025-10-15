@@ -1,5 +1,4 @@
 %{
-#include <cstdlib>
 #include "Parser.hpp"
 #include "AST.h"
 
@@ -65,8 +64,11 @@ syntax_tree::AST analize(int argc, char* argv[]) {
     
     syntax_tree::AST result;
     lisp_for_kids::Parser parser{ scanner, result };
-    if (parser.parse() != 0) {
-        std::cerr << "Parse error!" << std::endl;
+    if (parser.parse() == 0) {
+        std::cout << "Parse success.\n";
+    }
+    else {
+        std::cerr << "Parse error!\n";
     }
     
     yylex_destroy(scanner);
