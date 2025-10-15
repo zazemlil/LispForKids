@@ -30,3 +30,5 @@ BIND -> "(" id EXPR ")"
 
 num -> [-]?[0-9]+ 
 id  -> [a-zA-z][a-zA-z|0-9]*
+
+# после bindings в let может быть несколько EXPR
