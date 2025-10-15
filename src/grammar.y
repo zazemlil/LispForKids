@@ -13,6 +13,8 @@
 %param {yyscan_t scanner}
 %parse-param {syntax_tree::AST& result}
 
+%locations
+
 %code requires {
     #include "AST.h"
 }
@@ -20,7 +22,9 @@
 %code provides
 {
     #define YY_DECL \
-        int yylex(lisp_for_kids::Parser::semantic_type *yylval, yyscan_t yyscanner)
+        int yylex(lisp_for_kids::Parser::semantic_type *yylval, \
+                lisp_for_kids::Parser::location_type* yylloc, \
+                yyscan_t yyscanner)
     YY_DECL;
 }
 
@@ -87,17 +91,10 @@ bind: T_PARENTHESIS_OPEN T_IDENTIFIER expr T_PARENTHESIS_CLOSE {};
 
 %%
 
-void lisp_for_kids::Parser::error(const std::string& msg) {
-    /* const char* text = yyget_text(scanner);
-    int length = yyget_leng(scanner);
-    std::cerr << msg << " at token: '" << std::string(text, length) << "'\n"; */
+void lisp_for_kids::Parser::error(const location_type& loc, const std::string& msg) {
     const char* text = yyget_text(scanner);
     int length = yyget_leng(scanner);
-    int line = yyget_lineno(scanner);
-    int column = yyget_column(scanner); 
-        
-    std::cerr << "Error at line " << line << ", column " << column 
-                << ": " << msg 
-                << "\nLast token: '" << std::string(text, length) << "'" 
-                << std::endl;
+    
+    std::cerr << msg << " at (Line: " << loc.begin.line << ", Column: " << loc.begin.column
+            << ", Last token: '" << std::string(text, length) << "')\n";
 }

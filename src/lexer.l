@@ -5,11 +5,24 @@
 using namespace lisp_for_kids;
 void set_input_file(yyscan_t scanner, const char* filename);
 
+static int current_line = 1;
+static int current_column = 1;
+
 %}
 
-%option yylineno
+%option reentrant batch noyywrap yylineno nodefault outfile="Scanner.cpp" header="Scanner.hpp"
 
-%option reentrant batch noyywrap nodefault outfile="Scanner.cpp" header="Scanner.hpp"
+%{
+#define YY_USER_ACTION \
+    do { \
+        if (yylloc) { \
+            yylloc->begin.line = yylloc->end.line = current_line; \
+            yylloc->begin.column = current_column; \
+            yylloc->end.column = current_column + yyleng - 1; \
+        } \
+        current_column += yyleng; \
+    } while (0);
+%}
 
 %%
 
@@ -36,7 +49,9 @@ void set_input_file(yyscan_t scanner, const char* filename);
 [a-zA-z][a-zA-z|0-9]* { yylval->emplace<std::string>(std::string(yytext, yyleng)); return Parser::token::T_IDENTIFIER; }
 [-]?[0-9]+ { yylval->emplace<int>(atoi(yytext)); return Parser::token::T_LITERAL_INT; }
 
-[ \t\n\r ]
+\n { current_line++; current_column = 1; }
+\r { current_column = 1; }
+[ \t]+ {}
 
 <<EOF>> { return Parser::token::T_END_OF_FILE; }
 . { return yytext[0]; }
