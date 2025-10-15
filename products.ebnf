@@ -18,7 +18,7 @@ APPLICATION -> OP1 EXPR
         | "letrec" EXPR BINDINGS 
 
 OP1 -> "quote" | "car" | "cdr" | "atom"
-OP2 -> "add" | "sub" | "mul" | "div" | "rem" | "leq" | "cons" | "equal"
+OP2 -> "add" | "sub" | "mul" | "dive" | "rem" | "le" | "cons" | "equal"
 
 PARAMS -> id PARAMS
         | ε

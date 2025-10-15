@@ -12,22 +12,22 @@ void set_input_file(yyscan_t scanner, const char* filename);
 
 %%
 
-"QUOTE"|"quote"    { return Parser::token::T_QUOTE; }
-"CAR"|"car"        { return Parser::token::T_CAR; }
-"CDR"|"cdr"        { return Parser::token::T_CDR; }
-"CONS"|"cons"      { return Parser::token::T_CONS; }
-"ATOM"|"atom"      { return Parser::token::T_ATOM; }
-"EQUAL"|"equal"    { return Parser::token::T_EQUAL; }
-"ADD"|"add"        { return Parser::token::T_ADD; }
-"SUB"|"sub"        { return Parser::token::T_SUB; }
-"MUL"|"mul"        { return Parser::token::T_MUL; }
-"DIV"|"div"        { return Parser::token::T_DIV; }
-"REM"|"rem"        { return Parser::token::T_REM; }
-"LEQ"|"leq"        { return Parser::token::T_LEQ; }
-"COND"|"cond"      { return Parser::token::T_COND; }
-"LAMBDA"|"lambda"  { return Parser::token::T_LAMBDA; }
-"LET"|"let"        { return Parser::token::T_LET; }
-"LETREC"|"letrec"  { return Parser::token::T_LETREC; }
+[qQ][uU][oO][tT][eE]     { yylval->emplace<std::string>("QUOTE"); return Parser::token::T_QUOTE; }
+[cC][aA][rR]             { yylval->emplace<std::string>("CAR"); return Parser::token::T_CAR; }
+[cC][dD][rR]             { yylval->emplace<std::string>("CDR"); return Parser::token::T_CDR; }
+[cC][oO][nN][sS]         { yylval->emplace<std::string>("CONS"); return Parser::token::T_CONS; }
+[aA][tT][oO][mM]         { yylval->emplace<std::string>("ATOM"); return Parser::token::T_ATOM; }
+[eE][qQ][uU][aA][lL]     { yylval->emplace<std::string>("EQUAL"); return Parser::token::T_EQUAL; }
+[aA][dD][dD]             { yylval->emplace<std::string>("ADD"); return Parser::token::T_ADD; }
+[sS][uU][bB]             { yylval->emplace<std::string>("SUB"); return Parser::token::T_SUB; }
+[mM][uU][lL]             { yylval->emplace<std::string>("MUL"); return Parser::token::T_MUL; }
+[dD][iI][vV][eE]         { yylval->emplace<std::string>("DIVE"); return Parser::token::T_DIV; }
+[rR][eE][mM]             { yylval->emplace<std::string>("REM"); return Parser::token::T_REM; }
+[lL][eE]                 { yylval->emplace<std::string>("LE"); return Parser::token::T_LEQ; }
+[cC][oO][nN][dD]         { yylval->emplace<std::string>("COND"); return Parser::token::T_COND; }
+[lL][aA][mM][bB][dD][aA] { yylval->emplace<std::string>("LAMBDA"); return Parser::token::T_LAMBDA; }
+[lL][eE][tT]             { yylval->emplace<std::string>("LET"); return Parser::token::T_LET; }
+[lL][eE][tT][rR][eE][cC] { yylval->emplace<std::string>("LETREC"); return Parser::token::T_LETREC; }
 
 "(" { return Parser::token::T_PARENTHESIS_OPEN; }
 ")" { return Parser::token::T_PARENTHESIS_CLOSE; }
