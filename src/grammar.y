@@ -43,20 +43,24 @@
 %%
 
 s: expr T_END_OF_FILE {
-    std::unique_ptr<syntax_tree::ASTNode> test = std::make_unique<syntax_tree::LiteralInt>("testNode", 12); 
-    result = syntax_tree::AST(std::move(test));
+    result = syntax_tree::AST(std::move($1));
     YYACCEPT;
 };
 
-expr: atom {}
-    | T_PARENTHESIS_OPEN list T_PARENTHESIS_CLOSE {}
-    | T_PARENTHESIS_OPEN application T_PARENTHESIS_CLOSE {};
+expr: atom { $$ = std::move($1); }
+    | T_PARENTHESIS_OPEN list T_PARENTHESIS_CLOSE { $$ = std::move($2); }
+    | T_PARENTHESIS_OPEN application T_PARENTHESIS_CLOSE { $$ = std::move($2); };
 
-atom: T_IDENTIFIER {}
-    | T_LITERAL_INT {};
+atom: T_IDENTIFIER { $$ = std::make_unique<syntax_tree::Identifier>("Identifier", $1); }
+    | T_LITERAL_INT { $$ = std::make_unique<syntax_tree::LiteralInt>("LiteralInt", $1); };
 
-list: expr list {}
-    | %empty {};
+list: expr list {
+        auto l = std::make_unique<syntax_tree::ASTNode>("CONS");
+        l->addStatement(std::move($1));
+        l->addStatement(std::move($2));
+        $$ = std::move(l);
+    }
+    | %empty { $$ = std::make_unique<syntax_tree::ASTNode>("Nil"); };
     
 application: op1 expr {}
     | op2 expr expr {}
@@ -65,19 +69,19 @@ application: op1 expr {}
     | T_LET expr bindings {}
     | T_LETREC expr bindings {};
 
-op1: T_QUOTE {}
-    | T_CAR {}
-    | T_CDR {}
-    | T_ATOM {};
+op1: T_QUOTE { $$ = std::make_unique<syntax_tree::ASTNode>("QUOTE"); }
+    | T_CAR { $$ = std::make_unique<syntax_tree::ASTNode>("CAR"); }
+    | T_CDR { $$ = std::make_unique<syntax_tree::ASTNode>("CDR"); }
+    | T_ATOM { $$ = std::make_unique<syntax_tree::ASTNode>("ATOM"); };
 
-op2: T_ADD {}
-    | T_SUB {}
-    | T_MUL {}
-    | T_DIVE {}
-    | T_REM {}
-    | T_LE {}
-    | T_CONS {}
-    | T_EQUAL {};
+op2: T_ADD { $$ = std::make_unique<syntax_tree::ASTNode>("ADD"); }
+    | T_SUB { $$ = std::make_unique<syntax_tree::ASTNode>("SUB"); }
+    | T_MUL { $$ = std::make_unique<syntax_tree::ASTNode>("MUL"); }
+    | T_DIVE { $$ = std::make_unique<syntax_tree::ASTNode>("DIVE"); }
+    | T_REM { $$ = std::make_unique<syntax_tree::ASTNode>("REM"); }
+    | T_LE { $$ = std::make_unique<syntax_tree::ASTNode>("LE"); }
+    | T_CONS { $$ = std::make_unique<syntax_tree::ASTNode>("CONS"); }
+    | T_EQUAL { $$ = std::make_unique<syntax_tree::ASTNode>("EQUAL"); };
 
 params: T_IDENTIFIER params {}
     | %empty {};

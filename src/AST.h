@@ -29,13 +29,15 @@ public:
         return statements.at(index).get(); 
     }
 
-    virtual void printValue() const {}
+    virtual void printValue() const {
+        std::cout << node_type << " ";
+    }
 
     void print(int indent = 0) const {
         std::string indentStr = "|";
         for (int i = 0; i < indent-1; i++) {indentStr += "    |";}
         
-        std::cout << indentStr << "--- " << node_type << " ";
+        std::cout << indentStr << "--- ";
         this->printValue();
         std::cout << '\n';
         
@@ -50,7 +52,7 @@ class LiteralInt : public ASTNode {
 
 public:
     void printValue() const override {
-        std::cout << "(value = " << value << ")";
+        std::cout << value;
     }
 
     LiteralInt(std::string t, int v) : ASTNode(t), value(v) {}
@@ -61,7 +63,7 @@ class Identifier : public ASTNode {
 
 public:
     void printValue() const override {
-        std::cout << "(value = " << value << ")";
+        std::cout << value;
     }
 
     Identifier(std::string t, std::string v) : ASTNode(t), value(v) {}
