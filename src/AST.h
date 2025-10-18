@@ -20,6 +20,18 @@ public:
     void addStatement(std::unique_ptr<ASTNode> stmt) {
         statements.push_back(std::move(stmt));
     }
+
+    void addStatements(std::vector<std::unique_ptr<ASTNode>> statements) {
+        this->statements.insert(
+            std::end(this->statements),
+            std::make_move_iterator(std::begin(statements)),
+            std::make_move_iterator(std::end(statements))
+        );
+    }
+
+    void setStatements(std::vector<std::unique_ptr<ASTNode>> statements) {
+        this->statements = std::move(statements);
+    }
     
     size_t getStatementCount() const { 
         return statements.size(); 
@@ -34,10 +46,10 @@ public:
     }
 
     void print(int indent = 0) const {
-        std::string indentStr = "|";
-        for (int i = 0; i < indent-1; i++) {indentStr += "    |";}
+        std::string indentStr = ""; // "|"
+        for (int i = 0; i < indent-1; i++) {indentStr += "    ";} // "    |"
         
-        std::cout << indentStr << "--- ";
+        std::cout << indentStr << ""; // "--- "
         this->printValue();
         std::cout << '\n';
         

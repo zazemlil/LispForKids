@@ -1,1 +1,7 @@
-(1 2 3)
+(
+    LET (SUM X Y) 
+        (SUM (LAMBDA (A B) (ADD A B))) 
+        (X (QUOTE 3)) 
+        (Y (QUOTE 4)) 
+) 
+

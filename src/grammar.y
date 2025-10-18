@@ -38,7 +38,8 @@
 
 %token T_END_OF_FILE
 
-%type <std::unique_ptr<syntax_tree::ASTNode>> s expr atom list application op1 op2 params bindings bindingsTail bind
+%type <std::unique_ptr<syntax_tree::ASTNode>> s expr atom list application op1 op2 bind num id
+%type <std::vector<std::unique_ptr<syntax_tree::ASTNode>>> params bindings bindingsTail
 
 %%
 
@@ -47,12 +48,15 @@ s: expr T_END_OF_FILE {
     YYACCEPT;
 };
 
+
 expr: atom { $$ = std::move($1); }
     | T_PARENTHESIS_OPEN list T_PARENTHESIS_CLOSE { $$ = std::move($2); }
     | T_PARENTHESIS_OPEN application T_PARENTHESIS_CLOSE { $$ = std::move($2); };
 
-atom: T_IDENTIFIER { $$ = std::make_unique<syntax_tree::Identifier>("Identifier", $1); }
-    | T_LITERAL_INT { $$ = std::make_unique<syntax_tree::LiteralInt>("LiteralInt", $1); };
+
+atom: id { $$ = std::move($1); }
+    | num { $$ = std::move($1); };
+
 
 list: expr list {
         auto l = std::make_unique<syntax_tree::ASTNode>("CONS");
@@ -60,19 +64,43 @@ list: expr list {
         l->addStatement(std::move($2));
         $$ = std::move(l);
     }
-    | %empty { $$ = std::make_unique<syntax_tree::ASTNode>("Nil"); };
+    | %empty { $$ = std::make_unique<syntax_tree::ASTNode>("NIL"); };
     
-application: op1 expr {}
-    | op2 expr expr {}
-    | T_COND expr expr expr {}
-    | T_LAMBDA T_PARENTHESIS_OPEN params T_PARENTHESIS_CLOSE expr {}
-    | T_LET expr bindings {}
-    | T_LETREC expr bindings {};
+
+application: op1 expr { $1->addStatement(std::move($2)); $$ = std::move($1); }
+    | op2 expr expr { $1->addStatement(std::move($2)); $1->addStatement(std::move($3)); $$ = std::move($1); }
+    | T_COND expr expr expr { 
+        auto l = std::make_unique<syntax_tree::ASTNode>("COND");
+        l->addStatement(std::move($2)); 
+        l->addStatement(std::move($3)); 
+        l->addStatement(std::move($4)); 
+        $$ = std::move(l); 
+    }
+    | T_LAMBDA T_PARENTHESIS_OPEN params T_PARENTHESIS_CLOSE expr {
+        auto l = std::make_unique<syntax_tree::ASTNode>("LAMBDA");
+        l->setStatements(std::move($3)); 
+        l->addStatement(std::move($5));
+        $$ = std::move(l);
+    }
+    | T_LET expr bindings {
+        auto l = std::make_unique<syntax_tree::ASTNode>("LET");
+        l->addStatement(std::move($2));
+        l->addStatements(std::move($3)); 
+        $$ = std::move(l);
+    }
+    | T_LETREC expr bindings {
+        auto l = std::make_unique<syntax_tree::ASTNode>("LETREC");
+        l->addStatement(std::move($2));
+        l->addStatements(std::move($3)); 
+        $$ = std::move(l);
+    };
+
 
 op1: T_QUOTE { $$ = std::make_unique<syntax_tree::ASTNode>("QUOTE"); }
     | T_CAR { $$ = std::make_unique<syntax_tree::ASTNode>("CAR"); }
     | T_CDR { $$ = std::make_unique<syntax_tree::ASTNode>("CDR"); }
     | T_ATOM { $$ = std::make_unique<syntax_tree::ASTNode>("ATOM"); };
+
 
 op2: T_ADD { $$ = std::make_unique<syntax_tree::ASTNode>("ADD"); }
     | T_SUB { $$ = std::make_unique<syntax_tree::ASTNode>("SUB"); }
@@ -83,14 +111,33 @@ op2: T_ADD { $$ = std::make_unique<syntax_tree::ASTNode>("ADD"); }
     | T_CONS { $$ = std::make_unique<syntax_tree::ASTNode>("CONS"); }
     | T_EQUAL { $$ = std::make_unique<syntax_tree::ASTNode>("EQUAL"); };
 
-params: T_IDENTIFIER params {}
-    | %empty {};
 
-bindings: bind bindingsTail {};
-bindingsTail: bind bindingsTail {}
-    | %empty {};
+params: id params {
+        $2.insert($2.begin(), std::move($1));
+        $$ = std::move($2);
+    }
+    | %empty { $$ = std::vector<std::unique_ptr<syntax_tree::ASTNode>>(); };
 
-bind: T_PARENTHESIS_OPEN T_IDENTIFIER expr T_PARENTHESIS_CLOSE {};
+
+bindings: bind bindingsTail {
+    $2.insert($2.begin(), std::move($1));
+    $$ = std::move($2);
+};
+bindingsTail: bind bindingsTail {
+        $2.insert($2.begin(), std::move($1));
+        $$ = std::move($2);
+    }
+    | %empty { $$ = std::vector<std::unique_ptr<syntax_tree::ASTNode>>(); };
+
+
+bind: T_PARENTHESIS_OPEN id expr T_PARENTHESIS_CLOSE { 
+    auto b = std::make_unique<syntax_tree::ASTNode>("ASSIGN");
+    b->addStatement(std::move($2)); b->addStatement(std::move($3));
+    $$ = std::move(b);
+};
+
+num: T_LITERAL_INT { $$ = std::make_unique<syntax_tree::LiteralInt>("LiteralInt", $1); };
+id: T_IDENTIFIER { $$ = std::make_unique<syntax_tree::Identifier>("Identifier", $1); };
 
 %%
 
