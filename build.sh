@@ -17,12 +17,14 @@ cd ..
 echo "⚙️ Compiling project..."
 g++ -std=c++17 -I$SRC_DIR \
     $SRC_DIR/main.cpp \
+    $SRC_DIR/Emulator.cpp \
     $BUILD_DIR/Parser.cpp \
     $BUILD_DIR/Scanner.cpp \
     -o $BUILD_DIR/linux/main
 
 x86_64-w64-mingw32-g++ -static -I$SRC_DIR \
     $SRC_DIR/main.cpp \
+    $SRC_DIR/Emulator.cpp \
     $BUILD_DIR/Parser.cpp \
     $BUILD_DIR/Scanner.cpp \
     -o $BUILD_DIR/windows/main.exe
