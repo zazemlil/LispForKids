@@ -9,9 +9,10 @@ int main(int argc, char* argv[])
     syntax_tree::AST ast = analize(argc, argv);
     ast.print();
 
+    
     Emulator* e = new Emulator();
     syntax_tree::AST result = e->eval(std::move(ast));
     result.print();
-    
+
     return 0;
 }

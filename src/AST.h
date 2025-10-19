@@ -9,7 +9,7 @@ namespace syntax_tree {
 class ASTNode {
 private:
     std::string node_type;
-    std::vector<std::unique_ptr<ASTNode>> statements;
+    std::vector<std::shared_ptr<ASTNode>> statements;
 
 public:
     ASTNode() {}
@@ -17,28 +17,28 @@ public:
     
     virtual ~ASTNode() = default;
 
-    void addStatement(std::unique_ptr<ASTNode> stmt) {
-        statements.push_back(std::move(stmt));
+    void addStatement(std::shared_ptr<ASTNode> stmt) {
+        statements.push_back(stmt);
     }
 
-    void addStatements(std::vector<std::unique_ptr<ASTNode>> statements) {
+    void addStatements(std::vector<std::shared_ptr<ASTNode>> new_statements) {
         this->statements.insert(
             std::end(this->statements),
-            std::make_move_iterator(std::begin(statements)),
-            std::make_move_iterator(std::end(statements))
+            std::begin(new_statements),
+            std::end(new_statements)
         );
     }
 
-    void setStatements(std::vector<std::unique_ptr<ASTNode>> statements) {
-        this->statements = std::move(statements);
+    void setStatements(std::vector<std::shared_ptr<ASTNode>> new_statements) {
+        this->statements = new_statements;
     }
     
     size_t getStatementCount() const { 
         return statements.size(); 
     }
 
-    ASTNode* getStatement(size_t index) const { 
-        return statements.at(index).get(); 
+    std::shared_ptr<ASTNode> getStatement(size_t index) const { 
+        return statements.at(index);
     }
 
     virtual void printValue() const {
@@ -58,6 +58,100 @@ public:
         }
     }
 };
+
+
+// unary
+class QuoteNode : public ASTNode {
+public:
+    QuoteNode(std::string t) : ASTNode(t) {}
+};
+
+class CarNode : public ASTNode {
+public:
+    CarNode(std::string t) : ASTNode(t) {}
+};
+
+class CdrNode : public ASTNode {
+public:
+    CdrNode(std::string t) : ASTNode(t) {}
+};
+
+class AtomNode : public ASTNode {
+public:
+    AtomNode(std::string t) : ASTNode(t) {}
+};
+
+
+// binary
+class AddNode : public ASTNode {
+public:
+    AddNode(std::string t) : ASTNode(t) {}
+};
+
+class SubNode : public ASTNode {
+public:
+    SubNode(std::string t) : ASTNode(t) {}
+};
+
+class MulNode : public ASTNode {
+public:
+    MulNode(std::string t) : ASTNode(t) {}
+};
+
+class DiveNode : public ASTNode {
+public:
+    DiveNode(std::string t) : ASTNode(t) {}
+};
+
+class RemNode : public ASTNode {
+public:
+    RemNode(std::string t) : ASTNode(t) {}
+};
+
+class LeNode : public ASTNode {
+public:
+    LeNode(std::string t) : ASTNode(t) {}
+};
+
+class ConsNode : public ASTNode {
+public:
+    ConsNode(std::string t) : ASTNode(t) {}
+};
+
+class EqualNode : public ASTNode {
+public:
+    EqualNode(std::string t) : ASTNode(t) {}
+};
+
+
+// ternary
+class CondNode : public ASTNode {
+public:
+    CondNode(std::string t) : ASTNode(t) {}
+};
+
+
+// other Nodes
+class FCallNode : public ASTNode {
+public:
+    FCallNode(std::string t) : ASTNode(t) {}
+}; // maybe needs to fix AST creation in parser
+
+class LambdaNode : public ASTNode {
+public:
+    LambdaNode(std::string t) : ASTNode(t) {}
+};
+
+class LetNode : public ASTNode {
+public:
+    LetNode(std::string t) : ASTNode(t) {}
+};
+
+class LetrecNode : public ASTNode {
+public:
+    LetrecNode(std::string t) : ASTNode(t) {}
+};
+
 
 class LiteralInt : public ASTNode {
     int value;
@@ -83,15 +177,18 @@ public:
 
 class AST {
 private:
-    std::unique_ptr<ASTNode> root = nullptr;
+    std::shared_ptr<ASTNode> root = nullptr;
 
 public:
     AST() {}
-    AST(std::unique_ptr<ASTNode> rootNode) : root(std::move(rootNode)) {}
+    AST(std::shared_ptr<ASTNode> rootNode) : root(rootNode) {}
 
-    bool isEmpty() {
-        if (root == nullptr) return true;
-        return false;
+    std::shared_ptr<ASTNode> getRoot() {
+        return root;
+    }
+
+    bool isEmpty() const {
+        return root == nullptr;
     }
 
     void print() const {
