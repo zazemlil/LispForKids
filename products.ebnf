@@ -9,15 +9,16 @@ ATOM -> id | num
 LIST -> EXPR LIST
         | ε
 
-APPLICATION -> OP1 EXPR
-        | OP2 EXPR EXPR
-        | "cond" EXPR EXPR EXPR
+APPLICATION -> UNARYOP EXPR
+        | BINARYOP EXPR EXPR
+        | TERNARYOP EXPR EXPR EXPR
         | "lambda" "(" PARAMS ")" EXPR
         | "let" EXPR BINDINGS 
         | "letrec" EXPR BINDINGS 
 
-OP1 -> "quote" | "car" | "cdr" | "atom"
-OP2 -> "add" | "sub" | "mul" | "dive" | "rem" | "le" | "cons" | "equal"
+UNARYOP -> "quote" | "car" | "cdr" | "atom"
+BINARYOP -> "add" | "sub" | "mul" | "dive" | "rem" | "le" | "cons" | "equal"
+TERNARYOP -> "cond"
 
 PARAMS -> id PARAMS
         | ε

@@ -38,7 +38,7 @@
 
 %token T_END_OF_FILE
 
-%type <std::unique_ptr<syntax_tree::ASTNode>> s expr atom list application op1 op2 bind num id
+%type <std::unique_ptr<syntax_tree::ASTNode>> s expr atom list application unaryop binaryop ternaryop bind num id
 %type <std::vector<std::unique_ptr<syntax_tree::ASTNode>>> params bindings bindingsTail
 
 %%
@@ -67,15 +67,9 @@ list: expr list {
     | %empty { $$ = std::make_unique<syntax_tree::ASTNode>("NIL"); };
     
 
-application: op1 expr { $1->addStatement(std::move($2)); $$ = std::move($1); }
-    | op2 expr expr { $1->addStatement(std::move($2)); $1->addStatement(std::move($3)); $$ = std::move($1); }
-    | T_COND expr expr expr { 
-        auto l = std::make_unique<syntax_tree::ASTNode>("COND");
-        l->addStatement(std::move($2)); 
-        l->addStatement(std::move($3)); 
-        l->addStatement(std::move($4)); 
-        $$ = std::move(l); 
-    }
+application: unaryop expr { $1->addStatement(std::move($2)); $$ = std::move($1); }
+    | binaryop expr expr { $1->addStatement(std::move($2)); $1->addStatement(std::move($3)); $$ = std::move($1); }
+    | ternaryop expr expr expr { $1->addStatement(std::move($2)); $1->addStatement(std::move($3)); $1->addStatement(std::move($4)); $$ = std::move($1); }
     | T_LAMBDA T_PARENTHESIS_OPEN params T_PARENTHESIS_CLOSE expr {
         auto l = std::make_unique<syntax_tree::ASTNode>("LAMBDA");
         l->setStatements(std::move($3)); 
@@ -96,13 +90,13 @@ application: op1 expr { $1->addStatement(std::move($2)); $$ = std::move($1); }
     };
 
 
-op1: T_QUOTE { $$ = std::make_unique<syntax_tree::ASTNode>("QUOTE"); }
+unaryop: T_QUOTE { $$ = std::make_unique<syntax_tree::ASTNode>("QUOTE"); }
     | T_CAR { $$ = std::make_unique<syntax_tree::ASTNode>("CAR"); }
     | T_CDR { $$ = std::make_unique<syntax_tree::ASTNode>("CDR"); }
     | T_ATOM { $$ = std::make_unique<syntax_tree::ASTNode>("ATOM"); };
 
 
-op2: T_ADD { $$ = std::make_unique<syntax_tree::ASTNode>("ADD"); }
+binaryop: T_ADD { $$ = std::make_unique<syntax_tree::ASTNode>("ADD"); }
     | T_SUB { $$ = std::make_unique<syntax_tree::ASTNode>("SUB"); }
     | T_MUL { $$ = std::make_unique<syntax_tree::ASTNode>("MUL"); }
     | T_DIVE { $$ = std::make_unique<syntax_tree::ASTNode>("DIVE"); }
@@ -111,6 +105,7 @@ op2: T_ADD { $$ = std::make_unique<syntax_tree::ASTNode>("ADD"); }
     | T_CONS { $$ = std::make_unique<syntax_tree::ASTNode>("CONS"); }
     | T_EQUAL { $$ = std::make_unique<syntax_tree::ASTNode>("EQUAL"); };
 
+ternaryop: T_COND { $$ = std::make_unique<syntax_tree::ASTNode>("COND"); };
 
 params: id params {
         $2.insert($2.begin(), std::move($1));
