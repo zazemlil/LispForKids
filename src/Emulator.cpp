@@ -21,6 +21,9 @@ Node Emulator::eval(Node e, Matrix& n, Matrix& v) {
     else if (auto id = std::dynamic_pointer_cast<syntax_tree::Identifier>(e)) {
         return evalIdentifier(id, n, v);
     }
+    else if (auto quote = std::dynamic_pointer_cast<syntax_tree::QuoteNode>(e)) {
+        return evalQuoteNode(quote, n, v);
+    }
     else if (auto add = std::dynamic_pointer_cast<syntax_tree::AddNode>(e)) {
         return evalAddNode(add, n, v);
     }
@@ -66,6 +69,10 @@ LiteralBool Emulator::evalLiteralBool(LiteralBool litBool, Matrix& n, Matrix& v)
 
 Identifier Emulator::evalIdentifier(Identifier id, Matrix& n, Matrix& v) {
     return id;
+}
+
+Node Emulator::evalQuoteNode(QuoteNode quote, Matrix& n, Matrix& v) {
+    return quote->getStatement(0);
 }
 
 LiteralInt Emulator::evalAddNode(AddNode add, Matrix& n, Matrix& v) {
@@ -145,25 +152,22 @@ LiteralBool Emulator::evalLeNode(LeNode le, Matrix& n, Matrix& v) {
     throw std::runtime_error("Le operation requires integer operands");
 }
 
-ConsNode Emulator::evalConsNode(ConsNode cons, Matrix& n, Matrix& v) {
-    // auto left = eval(cons->getStatement(0), n, v);
-    // auto right = eval(cons->getStatement(1), n, v);
+ListNode Emulator::evalConsNode(ConsNode cons, Matrix& n, Matrix& v) {
+    auto left = eval(cons->getStatement(0), n, v);
+    auto right = eval(cons->getStatement(1), n, v);
 
-    // // Создаем новый ConsNode и добавляем вычисленные левую и правую части
-    // auto new_cons = std::make_shared<syntax_tree::ConsNode>("CONS");
-    // new_cons->addStatement(left);
-    // if (auto cons = std::dynamic_pointer_cast<syntax_tree::ConsNode>(right)) {
-    //     new_cons->addToValue(eval(cons, n, v));
-    // }
-    // else if (auto nil = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(right)) {
-    //     new_cons->addStatement(nil);
-    // }
+    auto new_cons = std::make_shared<syntax_tree::ListNode>("LIST");
+    new_cons->addStatement(left);
+    if (auto cons = std::dynamic_pointer_cast<syntax_tree::ListNode>(right)) {
+        new_cons->addStatement(cons);
+        return new_cons;
+    }
+    else if (auto nil = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(right)) {
+        new_cons->addStatement(nil);
+        return new_cons;
+    }
     
-    // return new_cons;
-    
-    
-    // //throw std::runtime_error("123");
-    return ConsNode();
+    throw std::runtime_error("Cons error!");
 }
 
 LiteralBool Emulator::evalEqualNode(EqualNode equal, Matrix& n, Matrix& v) {

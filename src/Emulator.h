@@ -5,10 +5,12 @@
 
 typedef std::vector<std::vector<std::shared_ptr<syntax_tree::ASTNode>>> Matrix;
 typedef std::shared_ptr<syntax_tree::ASTNode> Node;
+typedef std::shared_ptr<syntax_tree::ListNode> ListNode;
 typedef std::shared_ptr<syntax_tree::LiteralInt> LiteralInt;
 typedef std::shared_ptr<syntax_tree::LiteralNil> LiteralNil;
 typedef std::shared_ptr<syntax_tree::LiteralBool> LiteralBool;
 typedef std::shared_ptr<syntax_tree::Identifier> Identifier;
+typedef std::shared_ptr<syntax_tree::QuoteNode> QuoteNode;
 typedef std::shared_ptr<syntax_tree::AddNode> AddNode;
 typedef std::shared_ptr<syntax_tree::SubNode> SubNode;
 typedef std::shared_ptr<syntax_tree::MulNode> MulNode;
@@ -28,6 +30,9 @@ private:
     LiteralBool evalLiteralBool(LiteralBool litBool, Matrix& n, Matrix& v);
     Identifier evalIdentifier(Identifier id, Matrix& n, Matrix& v);
 
+    // unary
+    Node evalQuoteNode(QuoteNode quote, Matrix& n, Matrix& v);
+
     // binary
     LiteralInt evalAddNode(AddNode add, Matrix& n, Matrix& v);
     LiteralInt evalSubNode(SubNode sub, Matrix& n, Matrix& v);
@@ -35,7 +40,7 @@ private:
     LiteralInt evalDiveNode(DiveNode dive, Matrix& n, Matrix& v);
     LiteralInt evalRemNode(RemNode rem, Matrix& n, Matrix& v);
     LiteralBool evalLeNode(LeNode le, Matrix& n, Matrix& v);
-    ConsNode evalConsNode(ConsNode cons, Matrix& n, Matrix& v);
+    ListNode evalConsNode(ConsNode cons, Matrix& n, Matrix& v);
     LiteralBool evalEqualNode(EqualNode equal, Matrix& n, Matrix& v);
 
     // ternary

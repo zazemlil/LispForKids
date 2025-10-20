@@ -17,6 +17,10 @@ public:
     
     virtual ~ASTNode() = default;
 
+    std::string getNodeType() const {
+        return node_type;
+    }
+
     void addStatement(std::shared_ptr<ASTNode> stmt) {
         statements.push_back(stmt);
     }
@@ -41,8 +45,12 @@ public:
         return statements.at(index);
     }
 
-    virtual void printValue() const {
-        std::cout << node_type << " ";
+    std::vector<std::shared_ptr<ASTNode>> getStatements() const { 
+        return statements;
+    }
+
+    virtual void printValue(bool flat = false) const {
+        if (!flat) std::cout << node_type << " ";
     }
 
     void print(int indent = 0) const {
@@ -57,12 +65,25 @@ public:
             stmt->print(indent + 2);
         }
     }
+
+    virtual void printFlat() const {
+        this->printValue(true);
+        //std::cout << ' ';
+        
+        for (const auto& stmt : statements) {
+            stmt->printFlat();
+        }
+    }
 };
 
 
 // unary
 class QuoteNode : public ASTNode {
 public:
+    void printValue(bool flat = false) const override {
+        std::cout << getNodeType();
+    }
+
     QuoteNode(std::string t) : ASTNode(t) {}
 };
 
@@ -114,31 +135,7 @@ public:
 };
 
 class ConsNode : public ASTNode {
-private:
-    std::vector<std::shared_ptr<ASTNode>> value;
-
 public:
-    std::vector<std::shared_ptr<ASTNode>>& getValue() {
-        return value;
-    }
-
-    void addToValue(std::vector<std::shared_ptr<ASTNode>> value) {
-        this->value.insert(
-            std::end(this->value),
-            std::begin(value),
-            std::end(value)
-        );
-    }
-
-    void printValue() const override {
-        std::cout << '(';
-        for (const auto& v : value) {
-            v->printValue();
-            std::cout << ' ';
-        }
-        std::cout << ")\n";
-    }
-
     ConsNode(std::string t) : ASTNode(t) {}
 };
 
@@ -181,7 +178,7 @@ class LiteralInt : public ASTNode {
     int value;
 
 public:
-    void printValue() const override {
+    void printValue(bool flat = false) const override {
         std::cout << value;
     }
 
@@ -196,7 +193,7 @@ class LiteralBool : public ASTNode {
     bool value;
 
 public:
-    void printValue() const override {
+    void printValue(bool flat = false) const override {
         if (value) {
             std::cout << "TRUE";
         }
@@ -212,6 +209,23 @@ public:
     LiteralBool(std::string t, bool v) : ASTNode(t), value(v) {}
 };
 
+class ListNode : public ASTNode {
+public:
+    ListNode(std::string t) : ASTNode(t) {}
+
+    void printFlat() const override {
+        this->printValue(true);
+        std::cout << "(";
+        
+        for (const auto& stmt : getStatements()) {
+            stmt->printFlat();
+            std::cout << " ";
+        }
+
+        std::cout << ")";
+    }
+};
+
 class LiteralNil : public ASTNode {
 public:
     LiteralNil(std::string t) : ASTNode(t) {}
@@ -221,7 +235,7 @@ class Identifier : public ASTNode {
     std::string value;
 
 public:
-    void printValue() const override {
+    void printValue(bool flat = false) const override {
         std::cout << value;
     }
 
@@ -244,9 +258,10 @@ public:
         return root == nullptr;
     }
 
-    void print() const {
+    void print(bool flat = false) const {
         if (root) {
-            root->print(0);
+            if (!flat) root->print(0);
+            else root->printFlat();
         } else {
             std::cout << "AST is empty.\n";
         }

@@ -59,9 +59,9 @@ atom: id { $$ = $1; }
 
 
 list: expr list {
-        auto l = std::make_shared<syntax_tree::ASTNode>("CONS");
+        auto l = std::make_shared<syntax_tree::ListNode>("LIST");
         l->addStatement($1);
-        l->addStatement($2);
+        l->addStatements($2->getStatements());
         $$ = l;
     }
     | %empty { $$ = std::make_shared<syntax_tree::LiteralNil>("NIL"); };
@@ -90,7 +90,7 @@ application: unaryop expr { $1->addStatement($2); $$ = $1; }
     };
 
 
-unaryop: T_QUOTE { $$ = std::make_shared<syntax_tree::ASTNode>("QUOTE"); }
+unaryop: T_QUOTE { $$ = std::make_shared<syntax_tree::QuoteNode>("QUOTE"); }
     | T_CAR { $$ = std::make_shared<syntax_tree::ASTNode>("CAR"); }
     | T_CDR { $$ = std::make_shared<syntax_tree::ASTNode>("CDR"); }
     | T_ATOM { $$ = std::make_shared<syntax_tree::ASTNode>("ATOM"); };
