@@ -2,7 +2,10 @@
 #include <iostream>
 
 syntax_tree::AST Emulator::eval(syntax_tree::AST ast) {
-    Matrix n = {};
+    Matrix n = {
+        {std::make_shared<syntax_tree::Identifier>("Identifier", "A")},
+        {std::make_shared<syntax_tree::Identifier>("Identifier", "B")}
+    };
     // {
     //     {
     //         std::make_shared<syntax_tree::Identifier>("Identifier", "a"),
@@ -13,7 +16,10 @@ syntax_tree::AST Emulator::eval(syntax_tree::AST ast) {
     //         std::make_shared<syntax_tree::Identifier>("Identifier","c")
     //     }
     // };
-    Matrix v = {};
+    Matrix v = {
+        {std::make_shared<syntax_tree::LiteralBool>("LiteralBool", false)},
+        {std::make_shared<syntax_tree::LiteralInt>("LiteralInt", 1)}
+    };
     // {
     //     {
     //         std::make_shared<syntax_tree::LiteralInt>("LiteralInt", 1),
@@ -98,8 +104,8 @@ LiteralBool Emulator::evalLiteralBool(LiteralBool litBool, Matrix& n, Matrix& v)
     return litBool;
 }
 
-Identifier Emulator::evalIdentifier(Identifier id, Matrix& n, Matrix& v) {
-    return id;
+Node Emulator::evalIdentifier(Identifier id, Matrix& n, Matrix& v) {
+    return assoc(id, n, v);
 }
 
 Node Emulator::evalQuoteNode(QuoteNode quote, Matrix& n, Matrix& v) {
@@ -260,7 +266,7 @@ LiteralBool Emulator::evalEqualNode(EqualNode equal, Matrix& n, Matrix& v) {
 }
 
 Node Emulator::evalCondNode(CondNode cond, Matrix& n, Matrix& v) {
-    auto expr = eval(cond->getStatement(0), n, v);
+    auto expr = eval(cond->getStatement(0), n, v); 
     auto left = eval(cond->getStatement(1), n, v);
     auto right = eval(cond->getStatement(2), n, v);
 
@@ -347,6 +353,16 @@ Node Emulator::assoc(Identifier id, Matrix& n, Matrix& v) {
             }
         }
     }
-    
+
     throw std::runtime_error("Assoc: variable '" + id_value + "' not found");
+}
+
+Node Emulator::evalFuncCall(Node lambda, Matrix& n, Matrix& v) {
+    auto expr = lambda->getStatement(0);
+    if (auto list = std::dynamic_pointer_cast<syntax_tree::ListNode>(expr)) {
+        return Node();
+    }
+    else {
+        return eval(expr, n, v);
+    }
 }

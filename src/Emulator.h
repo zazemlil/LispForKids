@@ -33,7 +33,7 @@ private:
     LiteralInt evalLiteralInt(LiteralInt litInt, Matrix& n, Matrix& v);
     LiteralNil evalLiteralNil(LiteralNil litNil, Matrix& n, Matrix& v);
     LiteralBool evalLiteralBool(LiteralBool litBool, Matrix& n, Matrix& v);
-    Identifier evalIdentifier(Identifier id, Matrix& n, Matrix& v);
+    Node evalIdentifier(Identifier id, Matrix& n, Matrix& v);
 
     // unary
     Node evalQuoteNode(QuoteNode quote, Matrix& n, Matrix& v);
@@ -56,6 +56,7 @@ private:
 
     //other
     FuncClosureNode evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v);
+    Node evalFuncCall(Node lambda, Matrix& n, Matrix& v);
 
     //auxiliary functions
     Node matrixToListNode(const Matrix& matrix);

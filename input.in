@@ -1,4 +1,4 @@
 (
-    lambda (x) (add 1 2)
+    cond A (rem B B) (add B B)
 )
 
