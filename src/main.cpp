@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
     Emulator* e = new Emulator();
     std::cout << "\nResult tree:\n";
     syntax_tree::AST result = e->eval(std::move(ast));
-    result.print(true);
+    result.print(false);
     std::cout << "\n";
 
     return 0;

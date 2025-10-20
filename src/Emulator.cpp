@@ -2,8 +2,27 @@
 #include <iostream>
 
 syntax_tree::AST Emulator::eval(syntax_tree::AST ast) {
-    Matrix n;
-    Matrix v;
+    Matrix n = {};
+    // {
+    //     {
+    //         std::make_shared<syntax_tree::Identifier>("Identifier", "a"),
+    //         std::make_shared<syntax_tree::Identifier>("Identifier","b")
+            
+    //     },
+    //     {
+    //         std::make_shared<syntax_tree::Identifier>("Identifier","c")
+    //     }
+    // };
+    Matrix v = {};
+    // {
+    //     {
+    //         std::make_shared<syntax_tree::LiteralInt>("LiteralInt", 1),
+    //         std::make_shared<syntax_tree::LiteralInt>("LiteralInt", 2)
+    //     },
+    //     {
+    //         std::make_shared<syntax_tree::LiteralInt>("LiteralInt", 3)
+    //     }
+    // };
     Node root = eval(ast.getRoot(), n, v);
     return syntax_tree::AST(root);
 }
@@ -59,6 +78,9 @@ Node Emulator::eval(Node e, Matrix& n, Matrix& v) {
     }
     else if (auto cond = std::dynamic_pointer_cast<syntax_tree::CondNode>(e)) {
         return evalCondNode(cond, n, v);
+    }
+    else if (auto lam = std::dynamic_pointer_cast<syntax_tree::LambdaNode>(e)) {
+        return evalLambdaNode(lam, n, v);
     }
 
     throw std::runtime_error("Unknown node type");
@@ -252,4 +274,52 @@ Node Emulator::evalCondNode(CondNode cond, Matrix& n, Matrix& v) {
     }
     
     throw std::runtime_error("Cond error!");
+}
+
+Node Emulator::matrixToListNode(const Matrix& matrix) {
+    if (matrix.empty()) {
+        // auto l = std::make_shared<syntax_tree::ListNode>("LIST");
+        // l->addStatement(std::make_shared<syntax_tree::LiteralNil>("NIL"));
+        // l->addStatement(std::make_shared<syntax_tree::LiteralNil>("NIL"));
+        // return l;
+        return std::make_shared<syntax_tree::LiteralNil>("NIL");
+    }
+    
+    // Преобразуем матрицу в список списков
+    auto matrix_list = std::make_shared<syntax_tree::ListNode>("LIST");
+    
+    for (const auto& row : matrix) {
+        auto row_list = std::make_shared<syntax_tree::ListNode>("LIST");
+        for (const auto& element : row) {
+            row_list->addStatement(element);
+        }
+        matrix_list->addStatement(row_list);
+    }
+    
+    return matrix_list;
+}
+
+FuncClosureNode Emulator::evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v) {
+    auto params = std::make_shared<syntax_tree::ListNode>("LIST");
+    params->addStatement(lambda->getStatement(0));  
+    auto body = std::make_shared<syntax_tree::ListNode>("LIST");
+    body->addStatement(lambda->getStatement(1));    
+    
+    // (n v) = cons(n, cons(v, nil))
+    auto context_list = std::make_shared<syntax_tree::ListNode>("CONTEXT");
+
+    context_list->addStatement(matrixToListNode(n)); 
+    context_list->addStatement(matrixToListNode(v));
+    
+    // (y e) = cons(y, cons(e, nil))
+    auto function_part = std::make_shared<syntax_tree::ListNode>("FUNCTION_PART");
+    function_part->addStatement(params); 
+    function_part->addStatement(body);
+    
+    // zam = cons((y e), cons((n v), nil))
+    auto closure = std::make_shared<syntax_tree::FuncClosureNode>("CLOSURE");
+    closure->addStatement(function_part);   // (y e)
+    closure->addStatement(context_list);    // (n v)
+    
+    return closure;
 }

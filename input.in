@@ -1,9 +1,4 @@
 (
-    cond 
-        (atom 
-            (quote (a))
-        )
-        (add 1 2)
-        (sub 1 2)
+    lambda (x) (add 1 2)
 )
 

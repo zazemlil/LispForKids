@@ -23,6 +23,8 @@ typedef std::shared_ptr<syntax_tree::LeNode> LeNode;
 typedef std::shared_ptr<syntax_tree::ConsNode> ConsNode;
 typedef std::shared_ptr<syntax_tree::EqualNode> EqualNode;
 typedef std::shared_ptr<syntax_tree::CondNode> CondNode;
+typedef std::shared_ptr<syntax_tree::LambdaNode> LambdaNode;
+typedef std::shared_ptr<syntax_tree::FuncClosureNode> FuncClosureNode;
 
 class Emulator {
 private:
@@ -51,6 +53,11 @@ private:
 
     // ternary
     Node evalCondNode(CondNode cond, Matrix& n, Matrix& v);
+
+    //other
+    FuncClosureNode evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v);
+
+    Node matrixToListNode(const Matrix& matrix);
 
 public:
     syntax_tree::AST eval(syntax_tree::AST ast);

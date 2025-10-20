@@ -163,6 +163,11 @@ public:
     LambdaNode(std::string t) : ASTNode(t) {}
 };
 
+class FuncClosureNode : public ASTNode {
+public:
+    FuncClosureNode(std::string t) : ASTNode(t) {}
+};
+
 class LetNode : public ASTNode {
 public:
     LetNode(std::string t) : ASTNode(t) {}

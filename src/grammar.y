@@ -71,7 +71,7 @@ application: unaryop expr { $1->addStatement($2); $$ = $1; }
     | binaryop expr expr { $1->addStatement($2); $1->addStatement($3); $$ = $1; }
     | ternaryop expr expr expr { $1->addStatement($2); $1->addStatement($3); $1->addStatement($4); $$ = $1; }
     | T_LAMBDA T_PARENTHESIS_OPEN params T_PARENTHESIS_CLOSE expr {
-        auto l = std::make_shared<syntax_tree::ASTNode>("LAMBDA");
+        auto l = std::make_shared<syntax_tree::LambdaNode>("LAMBDA");
         l->setStatements($3); 
         l->addStatement($5);
         $$ = l;
