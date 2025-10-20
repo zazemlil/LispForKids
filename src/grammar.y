@@ -91,9 +91,9 @@ application: unaryop expr { $1->addStatement($2); $$ = $1; }
 
 
 unaryop: T_QUOTE { $$ = std::make_shared<syntax_tree::QuoteNode>("QUOTE"); }
-    | T_CAR { $$ = std::make_shared<syntax_tree::ASTNode>("CAR"); }
-    | T_CDR { $$ = std::make_shared<syntax_tree::ASTNode>("CDR"); }
-    | T_ATOM { $$ = std::make_shared<syntax_tree::ASTNode>("ATOM"); };
+    | T_CAR { $$ = std::make_shared<syntax_tree::CarNode>("CAR"); }
+    | T_CDR { $$ = std::make_shared<syntax_tree::CdrNode>("CDR"); }
+    | T_ATOM { $$ = std::make_shared<syntax_tree::AtomNode>("ATOM"); };
 
 
 binaryop: T_ADD { $$ = std::make_shared<syntax_tree::AddNode>("ADD"); }

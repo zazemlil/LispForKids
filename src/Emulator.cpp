@@ -24,6 +24,15 @@ Node Emulator::eval(Node e, Matrix& n, Matrix& v) {
     else if (auto quote = std::dynamic_pointer_cast<syntax_tree::QuoteNode>(e)) {
         return evalQuoteNode(quote, n, v);
     }
+    else if (auto car = std::dynamic_pointer_cast<syntax_tree::CarNode>(e)) {
+        return evalCarNode(car, n, v);
+    }
+    else if (auto cdr = std::dynamic_pointer_cast<syntax_tree::CdrNode>(e)) {
+        return evalCdrNode(cdr, n, v);
+    }
+    else if (auto atom = std::dynamic_pointer_cast<syntax_tree::AtomNode>(e)) {
+        return evalAtomNode(atom, n, v);
+    }
     else if (auto add = std::dynamic_pointer_cast<syntax_tree::AddNode>(e)) {
         return evalAddNode(add, n, v);
     }
@@ -73,6 +82,48 @@ Identifier Emulator::evalIdentifier(Identifier id, Matrix& n, Matrix& v) {
 
 Node Emulator::evalQuoteNode(QuoteNode quote, Matrix& n, Matrix& v) {
     return quote->getStatement(0);
+}
+
+Node Emulator::evalCarNode(CarNode car, Matrix& n, Matrix& v) {
+    auto c = eval(car->getStatement(0), n, v);
+    
+    if (auto nil = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(c)) {
+        return nil;
+    } else if (c->getStatementCount() >= 1) {
+        auto first = c->getStatement(0);
+        if (auto cons = std::dynamic_pointer_cast<syntax_tree::ListNode>(c)) {
+            return first;
+        }
+    }
+    
+    throw std::runtime_error("Car error!");
+}
+
+Node Emulator::evalCdrNode(CdrNode cdr, Matrix& n, Matrix& v) {
+    auto c = eval(cdr->getStatement(0), n, v);
+    
+    if (auto nil = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(c)) {
+        return nil;
+    } else if (c->getStatementCount() >= 2) {
+        auto new_list = std::make_shared<syntax_tree::ListNode>("LIST");
+        for (size_t i = 1; i < c->getStatementCount(); ++i) {
+            new_list->addStatement(c->getStatement(i));
+        }
+        return new_list;
+    } else if (c->getStatementCount() == 1) {
+        return std::make_shared<syntax_tree::LiteralNil>("NIL");
+    }
+    
+    throw std::runtime_error("Cdr error!");
+}
+
+Node Emulator::evalAtomNode(AtomNode atom, Matrix& n, Matrix& v) {
+    auto arg = eval(atom->getStatement(0), n, v);
+    
+    // true если аргумент атомарный (не список)
+    bool is_atom = (std::dynamic_pointer_cast<syntax_tree::ListNode>(arg) == nullptr);
+    
+    return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", is_atom);
 }
 
 LiteralInt Emulator::evalAddNode(AddNode add, Matrix& n, Matrix& v) {
@@ -193,10 +244,10 @@ Node Emulator::evalCondNode(CondNode cond, Matrix& n, Matrix& v) {
 
     if (auto e = std::dynamic_pointer_cast<syntax_tree::LiteralBool>(expr)) {
         if (e->getValue()) {
-            return eval(left, n, v);
+            return left;
         }
         else {
-            return eval(right, n, v);
+            return right;
         }
     }
     

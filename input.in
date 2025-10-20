@@ -1,5 +1,9 @@
-(cons
-    (add 1 2)
-    (quote())
+(
+    cond 
+        (atom 
+            (quote (a))
+        )
+        (add 1 2)
+        (sub 1 2)
 )
 
