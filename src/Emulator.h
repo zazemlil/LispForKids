@@ -4,11 +4,42 @@
 #include "AST.h"
 
 typedef std::vector<std::vector<std::shared_ptr<syntax_tree::ASTNode>>> Matrix;
+typedef std::shared_ptr<syntax_tree::ASTNode> Node;
+typedef std::shared_ptr<syntax_tree::LiteralInt> LiteralInt;
+typedef std::shared_ptr<syntax_tree::LiteralNil> LiteralNil;
+typedef std::shared_ptr<syntax_tree::LiteralBool> LiteralBool;
+typedef std::shared_ptr<syntax_tree::Identifier> Identifier;
+typedef std::shared_ptr<syntax_tree::AddNode> AddNode;
+typedef std::shared_ptr<syntax_tree::SubNode> SubNode;
+typedef std::shared_ptr<syntax_tree::MulNode> MulNode;
+typedef std::shared_ptr<syntax_tree::DiveNode> DiveNode;
+typedef std::shared_ptr<syntax_tree::RemNode> RemNode;
+typedef std::shared_ptr<syntax_tree::LeNode> LeNode;
+typedef std::shared_ptr<syntax_tree::ConsNode> ConsNode;
+typedef std::shared_ptr<syntax_tree::EqualNode> EqualNode;
+typedef std::shared_ptr<syntax_tree::CondNode> CondNode;
 
 class Emulator {
 private:
-    std::shared_ptr<syntax_tree::ASTNode> eval(std::shared_ptr<syntax_tree::ASTNode> e, Matrix& n, Matrix& v);
-    std::shared_ptr<syntax_tree::ASTNode> evalLiteral(std::shared_ptr<syntax_tree::LiteralInt> lit, Matrix& n, Matrix& v);
+    Node eval(Node e, Matrix& n, Matrix& v);
+
+    LiteralInt evalLiteralInt(LiteralInt litInt, Matrix& n, Matrix& v);
+    LiteralNil evalLiteralNil(LiteralNil litNil, Matrix& n, Matrix& v);
+    LiteralBool evalLiteralBool(LiteralBool litBool, Matrix& n, Matrix& v);
+    Identifier evalIdentifier(Identifier id, Matrix& n, Matrix& v);
+
+    // binary
+    LiteralInt evalAddNode(AddNode add, Matrix& n, Matrix& v);
+    LiteralInt evalSubNode(SubNode sub, Matrix& n, Matrix& v);
+    LiteralInt evalMulNode(MulNode mul, Matrix& n, Matrix& v);
+    LiteralInt evalDiveNode(DiveNode dive, Matrix& n, Matrix& v);
+    LiteralInt evalRemNode(RemNode rem, Matrix& n, Matrix& v);
+    LiteralBool evalLeNode(LeNode le, Matrix& n, Matrix& v);
+    ConsNode evalConsNode(ConsNode cons, Matrix& n, Matrix& v);
+    LiteralBool evalEqualNode(EqualNode equal, Matrix& n, Matrix& v);
+
+    // ternary
+    Node evalCondNode(CondNode cond, Matrix& n, Matrix& v);
 
 public:
     syntax_tree::AST eval(syntax_tree::AST ast);

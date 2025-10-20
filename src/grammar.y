@@ -64,7 +64,7 @@ list: expr list {
         l->addStatement($2);
         $$ = l;
     }
-    | %empty { $$ = std::make_shared<syntax_tree::ASTNode>("NIL"); };
+    | %empty { $$ = std::make_shared<syntax_tree::LiteralNil>("NIL"); };
     
 
 application: unaryop expr { $1->addStatement($2); $$ = $1; }
@@ -96,16 +96,16 @@ unaryop: T_QUOTE { $$ = std::make_shared<syntax_tree::ASTNode>("QUOTE"); }
     | T_ATOM { $$ = std::make_shared<syntax_tree::ASTNode>("ATOM"); };
 
 
-binaryop: T_ADD { $$ = std::make_shared<syntax_tree::ASTNode>("ADD"); }
-    | T_SUB { $$ = std::make_shared<syntax_tree::ASTNode>("SUB"); }
-    | T_MUL { $$ = std::make_shared<syntax_tree::ASTNode>("MUL"); }
-    | T_DIVE { $$ = std::make_shared<syntax_tree::ASTNode>("DIVE"); }
-    | T_REM { $$ = std::make_shared<syntax_tree::ASTNode>("REM"); }
-    | T_LE { $$ = std::make_shared<syntax_tree::ASTNode>("LE"); }
-    | T_CONS { $$ = std::make_shared<syntax_tree::ASTNode>("CONS"); }
-    | T_EQUAL { $$ = std::make_shared<syntax_tree::ASTNode>("EQUAL"); };
+binaryop: T_ADD { $$ = std::make_shared<syntax_tree::AddNode>("ADD"); }
+    | T_SUB { $$ = std::make_shared<syntax_tree::SubNode>("SUB"); }
+    | T_MUL { $$ = std::make_shared<syntax_tree::MulNode>("MUL"); }
+    | T_DIVE { $$ = std::make_shared<syntax_tree::DiveNode>("DIVE"); }
+    | T_REM { $$ = std::make_shared<syntax_tree::RemNode>("REM"); }
+    | T_LE { $$ = std::make_shared<syntax_tree::LeNode>("LE"); }
+    | T_CONS { $$ = std::make_shared<syntax_tree::ConsNode>("CONS"); }
+    | T_EQUAL { $$ = std::make_shared<syntax_tree::EqualNode>("EQUAL"); };
 
-ternaryop: T_COND { $$ = std::make_shared<syntax_tree::ASTNode>("COND"); };
+ternaryop: T_COND { $$ = std::make_shared<syntax_tree::CondNode>("COND"); };
 
 params: id params {
         $2.insert($2.begin(), $1);

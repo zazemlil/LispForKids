@@ -114,7 +114,31 @@ public:
 };
 
 class ConsNode : public ASTNode {
+private:
+    std::vector<std::shared_ptr<ASTNode>> value;
+
 public:
+    std::vector<std::shared_ptr<ASTNode>>& getValue() {
+        return value;
+    }
+
+    void addToValue(std::vector<std::shared_ptr<ASTNode>> value) {
+        this->value.insert(
+            std::end(this->value),
+            std::begin(value),
+            std::end(value)
+        );
+    }
+
+    void printValue() const override {
+        std::cout << '(';
+        for (const auto& v : value) {
+            v->printValue();
+            std::cout << ' ';
+        }
+        std::cout << ")\n";
+    }
+
     ConsNode(std::string t) : ASTNode(t) {}
 };
 
@@ -161,7 +185,36 @@ public:
         std::cout << value;
     }
 
+    int getValue() {
+        return value;
+    }
+
     LiteralInt(std::string t, int v) : ASTNode(t), value(v) {}
+};
+
+class LiteralBool : public ASTNode {
+    bool value;
+
+public:
+    void printValue() const override {
+        if (value) {
+            std::cout << "TRUE";
+        }
+        else {
+            std::cout << "FALSE";
+        }
+    }
+
+    bool getValue() {
+        return value;
+    }
+
+    LiteralBool(std::string t, bool v) : ASTNode(t), value(v) {}
+};
+
+class LiteralNil : public ASTNode {
+public:
+    LiteralNil(std::string t) : ASTNode(t) {}
 };
 
 class Identifier : public ASTNode {
