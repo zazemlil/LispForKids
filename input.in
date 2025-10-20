@@ -1,6 +1,5 @@
-(cond 
-     (equal (add 2 2) (mul 2 2)) 
-     (add (add 2 2) (mul 2 2)) 
-     (sub (mul 2 2) (add 2 2)) 
+(cons
+    (add 1 2)
+    (quote())
 )
 

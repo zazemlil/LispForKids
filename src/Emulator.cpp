@@ -159,11 +159,10 @@ ListNode Emulator::evalConsNode(ConsNode cons, Matrix& n, Matrix& v) {
     auto new_cons = std::make_shared<syntax_tree::ListNode>("LIST");
     new_cons->addStatement(left);
     if (auto cons = std::dynamic_pointer_cast<syntax_tree::ListNode>(right)) {
-        new_cons->addStatement(cons);
+        new_cons->addStatements(cons->getStatements());
         return new_cons;
     }
     else if (auto nil = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(right)) {
-        new_cons->addStatement(nil);
         return new_cons;
     }
     
