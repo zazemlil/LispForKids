@@ -244,6 +244,10 @@ public:
         std::cout << value;
     }
 
+    std::string getValue() {
+        return value;
+    }
+
     Identifier(std::string t, std::string v) : ASTNode(t), value(v) {}
 };
 

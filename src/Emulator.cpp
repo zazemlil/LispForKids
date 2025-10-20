@@ -323,3 +323,30 @@ FuncClosureNode Emulator::evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v
     
     return closure;
 }
+
+Node Emulator::assoc(Identifier id, Matrix& n, Matrix& v) {
+    auto id_value = id->getValue();
+    
+    if (n.size() != v.size()) {
+        throw std::runtime_error("Assoc: names and values matrices have different sizes");
+    }
+    
+    for (size_t i = 0; i < n.size(); ++i) {
+        const auto& names_row = n[i];
+        const auto& values_row = v[i];
+        
+        if (names_row.size() != values_row.size()) {
+            throw std::runtime_error("Assoc: names and values row sizes mismatch");
+        }
+        
+        for (size_t j = 0; j < names_row.size(); ++j) {
+            if (auto identifier = std::dynamic_pointer_cast<syntax_tree::Identifier>(names_row[j])) {
+                if (identifier->getValue() == id_value) {
+                    return values_row[j];
+                }
+            }
+        }
+    }
+    
+    throw std::runtime_error("Assoc: variable '" + id_value + "' not found");
+}

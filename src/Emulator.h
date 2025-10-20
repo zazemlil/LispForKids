@@ -57,7 +57,9 @@ private:
     //other
     FuncClosureNode evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v);
 
+    //auxiliary functions
     Node matrixToListNode(const Matrix& matrix);
+    Node assoc(Identifier id, Matrix& n, Matrix& v);
 
 public:
     syntax_tree::AST eval(syntax_tree::AST ast);
