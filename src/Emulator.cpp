@@ -273,14 +273,6 @@ Node Emulator::evalCondNode(CondNode cond, Matrix& n, Matrix& v) {
 }
 
 Node Emulator::matrixToListNode(const Matrix& matrix) {
-    // if (matrix.empty()) {
-    //     // auto l = std::make_shared<syntax_tree::ListNode>("LIST");
-    //     // l->addStatement(std::make_shared<syntax_tree::LiteralNil>("NIL"));
-    //     // l->addStatement(std::make_shared<syntax_tree::LiteralNil>("NIL"));
-    //     // return l;
-    //     return std::make_shared<syntax_tree::LiteralNil>("NIL");
-    // }
-    
     // Преобразуем матрицу в список списков
     auto matrix_list = std::make_shared<syntax_tree::ListNode>("LIST");
     
@@ -293,6 +285,29 @@ Node Emulator::matrixToListNode(const Matrix& matrix) {
     }
     
     return matrix_list;
+}
+
+Matrix Emulator::listToMatrix(ListNode list) {
+    Matrix matrix;
+    
+    if (!list) {
+        return matrix;
+    }
+    
+    for (size_t i = 0; i < list->getStatementCount(); ++i) {
+        auto row_node = list->getStatement(i);
+        auto row_list = std::dynamic_pointer_cast<syntax_tree::ListNode>(row_node);
+        
+        if (row_list) {
+            std::vector<std::shared_ptr<syntax_tree::ASTNode>> row;
+            for (size_t j = 0; j < row_list->getStatementCount(); ++j) {
+                row.push_back(row_list->getStatement(j));
+            }
+            matrix.push_back(row);
+        }
+    }
+    
+    return matrix;
 }
 
 FuncClosureNode Emulator::evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v) {
@@ -381,9 +396,9 @@ Node Emulator::evalFuncCall(Node func, Matrix& n, Matrix& v) {
             auto closure_arg_names = closure->getStatement(0)->getStatement(0)->getStatements();
             closure->getStatement(1)->getStatement(0)->addStatements(closure_arg_names);
             closure->getStatement(1)->getStatement(1)->addStatements(evaluated_args);
-            return closure;
+            //return closure;
             
-            //return applyClosure(closure, n, v);
+            return evalClosure(closure, n, v);
         } else {
             throw std::runtime_error("Function call: first element must be a closure");
         }
@@ -414,4 +429,24 @@ Node Emulator::evalLetNode(LetNode let, Matrix& n, Matrix& v) {
     auto result = evalFuncCall(expr, n, v);
 
     return result;
+}
+
+Node Emulator::evalClosure(FuncClosureNode closure, Matrix& n, Matrix& v) {
+    Matrix local_n = {closure->getStatement(1)->getStatement(0)->getStatements()};
+    Matrix local_v = {closure->getStatement(1)->getStatement(1)->getStatements()};
+
+    // for (size_t i = 0; i < local_n.size(); ++i) {
+    //     const auto& names_row = local_n[i];
+    //     const auto& values_row = local_v[i];
+        
+    //     for (size_t j = 0; j < names_row.size(); ++j) {
+    //         names_row[j]->print();
+    //         values_row[j]->print();
+    //         std::cout << "\n";
+    //     }
+    //     std::cout << "---\n";
+    // }
+
+
+    return eval(closure->getStatement(0)->getStatement(1)->getStatement(0), local_n, local_v);
 }

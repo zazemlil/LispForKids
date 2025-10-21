@@ -1,11 +1,17 @@
-(let
-     (f (quote 3) (quote 3))
-     (f 
-          (lambda (x y)
-               (mul x (f x y))
+(let 
+     (drih m n) (
+          drih (
+               lambda (a b) (
+                    cond 
+                         (equal (rem a b) (quote 0)) 
+                         (dive a b) 
+                         (add (dive a b) 1)
+               ) 
           )
      )
+     (m (quote 3))
+     (n (quote 2))
 )
 
-# evalLetrec + разобраться как вычисляется closure
+# evalLetrec
 

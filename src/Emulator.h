@@ -59,9 +59,11 @@ private:
     FuncClosureNode evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v);
     Node evalFuncCall(Node func, Matrix& n, Matrix& v);
     Node evalLetNode(LetNode let, Matrix& n, Matrix& v);
+    Node evalClosure(FuncClosureNode closure, Matrix& n, Matrix& v);
 
     //auxiliary functions
     Node matrixToListNode(const Matrix& matrix);
+    Matrix listToMatrix(ListNode list);
     Node assoc(Identifier id, Matrix& n, Matrix& v);
 
 public:
