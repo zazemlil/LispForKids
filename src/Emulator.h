@@ -63,7 +63,6 @@ private:
 
     //auxiliary functions
     Node matrixToListNode(const Matrix& matrix);
-    Matrix listToMatrix(ListNode list);
     Node assoc(Identifier id, Matrix& n, Matrix& v);
 
 public:

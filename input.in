@@ -1,17 +1,16 @@
-(let 
-     (drih m n) (
-          drih (
-               lambda (a b) (
+(let
+    (f (quote 5)) 
+    (f 
+        (
+            lambda (a) (
                     cond 
-                         (equal (rem a b) (quote 0)) 
-                         (dive a b) 
-                         (add (dive a b) 1)
-               ) 
-          )
-     )
-     (m (quote 3))
-     (n (quote 2))
+                         (equal a (quote 0)) 
+                         (quote 1) 
+                         (mul (a) (f (sub a 1))) 
+            )
+        )
+    )
 )
 
-# evalLetrec
+# evalLetrec + equal для bool значений и quote() - NIL
 
