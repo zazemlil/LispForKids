@@ -242,18 +242,33 @@ LiteralBool Emulator::evalEqualNode(EqualNode equal, Matrix& n, Matrix& v) {
     auto left = eval(equal->getStatement(0), n, v);
     auto right = eval(equal->getStatement(1), n, v);
 
-    if (auto left_lit = std::dynamic_pointer_cast<syntax_tree::LiteralInt>(left)) {
-        if (auto right_lit = std::dynamic_pointer_cast<syntax_tree::LiteralInt>(right)) {
-            if (left_lit->getValue() == right_lit->getValue()) {
-                return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", true);
-            }
-            else {
-                return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", false);
+    bool left_is_atom = (std::dynamic_pointer_cast<syntax_tree::ListNode>(left) == nullptr);
+    bool right_is_atom = (std::dynamic_pointer_cast<syntax_tree::ListNode>(right) == nullptr);
+
+    if (left_is_atom || right_is_atom) {
+        if (auto left_lit = std::dynamic_pointer_cast<syntax_tree::LiteralInt>(left)) {
+            if (auto right_lit = std::dynamic_pointer_cast<syntax_tree::LiteralInt>(right)) {
+                if (left_lit->getValue() == right_lit->getValue()) {
+                    return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", true);
+                }
             }
         }
+        if (auto left_lit = std::dynamic_pointer_cast<syntax_tree::LiteralBool>(left)) {
+            if (auto right_lit = std::dynamic_pointer_cast<syntax_tree::LiteralBool>(right)) {
+                if (left_lit->getValue() == right_lit->getValue()) {
+                    return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", true);
+                }
+            }
+        }
+        if (auto left_lit = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(left)) {
+            if (auto right_lit = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(right)) {
+                return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", true);
+            }
+        }
+        return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", false);
     }
-        
-    throw std::runtime_error("Equal operation requires integer operands");
+
+    throw std::runtime_error("Equal operation requires 1 or 2 atom operands");
 }
 
 Node Emulator::evalCondNode(CondNode cond, Matrix& n, Matrix& v) {
