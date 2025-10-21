@@ -1,6 +1,11 @@
-(
-    lambda (a b) (add 2 3)
+(let
+     (f (quote 3) (quote 3))
+     (f 
+          (lambda (x y)
+               (mul x (f x y))
+          )
+     )
 )
 
-# контекст работает! нужно: evalFuncCall, evalLet, evalLetrec + разобраться как вычисляется closure
+# evalLetrec + разобраться как вычисляется closure
 

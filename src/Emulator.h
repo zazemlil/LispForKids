@@ -25,6 +25,7 @@ typedef std::shared_ptr<syntax_tree::EqualNode> EqualNode;
 typedef std::shared_ptr<syntax_tree::CondNode> CondNode;
 typedef std::shared_ptr<syntax_tree::LambdaNode> LambdaNode;
 typedef std::shared_ptr<syntax_tree::FuncClosureNode> FuncClosureNode;
+typedef std::shared_ptr<syntax_tree::LetNode> LetNode;
 
 class Emulator {
 private:
@@ -57,6 +58,7 @@ private:
     //other
     FuncClosureNode evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v);
     Node evalFuncCall(Node func, Matrix& n, Matrix& v);
+    Node evalLetNode(LetNode let, Matrix& n, Matrix& v);
 
     //auxiliary functions
     Node matrixToListNode(const Matrix& matrix);

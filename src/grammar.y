@@ -77,7 +77,7 @@ application: unaryop expr { $1->addStatement($2); $$ = $1; }
         $$ = l;
     }
     | T_LET expr bindings {
-        auto l = std::make_shared<syntax_tree::ASTNode>("LET");
+        auto l = std::make_shared<syntax_tree::LetNode>("LET");
         l->addStatement($2);
         l->addStatements($3); 
         $$ = l;

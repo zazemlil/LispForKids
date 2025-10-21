@@ -2,18 +2,20 @@
 #include <iostream>
 
 syntax_tree::AST Emulator::eval(syntax_tree::AST ast) {
-    Matrix n = {
-        {
-            std::make_shared<syntax_tree::Identifier>("Identifier", "A"),
-            std::make_shared<syntax_tree::Identifier>("Identifier", "B")
-        }
-    };
-    Matrix v = {
-        {
-            std::make_shared<syntax_tree::LiteralBool>("LiteralBool", false),
-            std::make_shared<syntax_tree::LiteralInt>("LiteralInt", 1)
-        }
-    };
+    Matrix n;
+    // {
+    //     {
+    //         std::make_shared<syntax_tree::Identifier>("Identifier", "A"),
+    //         std::make_shared<syntax_tree::Identifier>("Identifier", "B")
+    //     }
+    // };
+    Matrix v;
+    // {
+    //     {
+    //         std::make_shared<syntax_tree::LiteralBool>("LiteralBool", false),
+    //         std::make_shared<syntax_tree::LiteralInt>("LiteralInt", 1)
+    //     }
+    // };
     Node root = eval(ast.getRoot(), n, v);
     return syntax_tree::AST(root);
 }
@@ -72,6 +74,9 @@ Node Emulator::eval(Node e, Matrix& n, Matrix& v) {
     }
     else if (auto lam = std::dynamic_pointer_cast<syntax_tree::LambdaNode>(e)) {
         return evalLambdaNode(lam, n, v);
+    }
+    else if (auto let = std::dynamic_pointer_cast<syntax_tree::LetNode>(e)) {
+        return evalLetNode(let, n, v);
     }
 
     throw std::runtime_error("Unknown node type");
@@ -268,13 +273,13 @@ Node Emulator::evalCondNode(CondNode cond, Matrix& n, Matrix& v) {
 }
 
 Node Emulator::matrixToListNode(const Matrix& matrix) {
-    if (matrix.empty()) {
-        // auto l = std::make_shared<syntax_tree::ListNode>("LIST");
-        // l->addStatement(std::make_shared<syntax_tree::LiteralNil>("NIL"));
-        // l->addStatement(std::make_shared<syntax_tree::LiteralNil>("NIL"));
-        // return l;
-        return std::make_shared<syntax_tree::LiteralNil>("NIL");
-    }
+    // if (matrix.empty()) {
+    //     // auto l = std::make_shared<syntax_tree::ListNode>("LIST");
+    //     // l->addStatement(std::make_shared<syntax_tree::LiteralNil>("NIL"));
+    //     // l->addStatement(std::make_shared<syntax_tree::LiteralNil>("NIL"));
+    //     // return l;
+    //     return std::make_shared<syntax_tree::LiteralNil>("NIL");
+    // }
     
     // Преобразуем матрицу в список списков
     auto matrix_list = std::make_shared<syntax_tree::ListNode>("LIST");
@@ -363,18 +368,22 @@ Node Emulator::evalFuncCall(Node func, Matrix& n, Matrix& v) {
         }
 
         // nv refresh
-        n.insert(n.begin(), arg_names);
-        v.insert(v.begin(), evaluated_args);
-        
+        // n.insert(n.begin(), arg_names);
+        // v.insert(v.begin(), evaluated_args);
+
         // e0
         auto func_closure_node = eval(list->getStatement(0), n, v);
 
         if (auto closure = std::dynamic_pointer_cast<syntax_tree::FuncClosureNode>(func_closure_node)) {
-            if (closure->getStatementCount() != func->getStatementCount()) {
+            if (closure->getStatement(0)->getStatement(0)->getStatementCount() != func->getStatementCount()-1) {
                 throw std::runtime_error("Function call: params count error");
             }
-            //return applyClosure(closure, evaluated_args, n, v);
+            auto closure_arg_names = closure->getStatement(0)->getStatement(0)->getStatements();
+            closure->getStatement(1)->getStatement(0)->addStatements(closure_arg_names);
+            closure->getStatement(1)->getStatement(1)->addStatements(evaluated_args);
             return closure;
+            
+            //return applyClosure(closure, n, v);
         } else {
             throw std::runtime_error("Function call: first element must be a closure");
         }
@@ -382,4 +391,27 @@ Node Emulator::evalFuncCall(Node func, Matrix& n, Matrix& v) {
     else {
         return eval(func, n, v);
     }
+    throw std::runtime_error("Function call: error");
+}
+
+Node Emulator::evalLetNode(LetNode let, Matrix& n, Matrix& v) {
+    auto expr = let->getStatement(0);
+
+    // (e1 ... ek)
+    std::vector<std::shared_ptr<syntax_tree::ASTNode>> evaluated_args;
+    std::vector<std::shared_ptr<syntax_tree::ASTNode>> arg_names;
+    for (int i = 1; i < let->getStatementCount(); i++) {
+        auto statement = let->getStatement(i);
+        auto evaluated_arg = eval(statement->getStatement(1), n, v);
+        arg_names.push_back(statement->getStatement(0));
+        evaluated_args.push_back(evaluated_arg);
+    }
+
+    // nv refresh
+    n.insert(n.begin(), arg_names);
+    v.insert(v.begin(), evaluated_args);
+
+    auto result = evalFuncCall(expr, n, v);
+
+    return result;
 }
