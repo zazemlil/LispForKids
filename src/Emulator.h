@@ -56,7 +56,7 @@ private:
 
     //other
     FuncClosureNode evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v);
-    Node evalFuncCall(Node lambda, Matrix& n, Matrix& v);
+    Node evalFuncCall(Node func, Matrix& n, Matrix& v);
 
     //auxiliary functions
     Node matrixToListNode(const Matrix& matrix);

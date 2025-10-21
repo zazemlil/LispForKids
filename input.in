@@ -1,5 +1,5 @@
 (
-    lambda (a b) (1 2 3)
+    lambda (a b) (add 2 3)
 )
 
 # контекст работает! нужно: evalFuncCall, evalLet, evalLetrec + разобраться как вычисляется closure

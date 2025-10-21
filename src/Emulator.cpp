@@ -3,32 +3,17 @@
 
 syntax_tree::AST Emulator::eval(syntax_tree::AST ast) {
     Matrix n = {
-        {std::make_shared<syntax_tree::Identifier>("Identifier", "A")},
-        {std::make_shared<syntax_tree::Identifier>("Identifier", "B")}
+        {
+            std::make_shared<syntax_tree::Identifier>("Identifier", "A"),
+            std::make_shared<syntax_tree::Identifier>("Identifier", "B")
+        }
     };
-    // {
-    //     {
-    //         std::make_shared<syntax_tree::Identifier>("Identifier", "a"),
-    //         std::make_shared<syntax_tree::Identifier>("Identifier","b")
-            
-    //     },
-    //     {
-    //         std::make_shared<syntax_tree::Identifier>("Identifier","c")
-    //     }
-    // };
     Matrix v = {
-        {std::make_shared<syntax_tree::LiteralBool>("LiteralBool", false)},
-        {std::make_shared<syntax_tree::LiteralInt>("LiteralInt", 1)}
+        {
+            std::make_shared<syntax_tree::LiteralBool>("LiteralBool", false),
+            std::make_shared<syntax_tree::LiteralInt>("LiteralInt", 1)
+        }
     };
-    // {
-    //     {
-    //         std::make_shared<syntax_tree::LiteralInt>("LiteralInt", 1),
-    //         std::make_shared<syntax_tree::LiteralInt>("LiteralInt", 2)
-    //     },
-    //     {
-    //         std::make_shared<syntax_tree::LiteralInt>("LiteralInt", 3)
-    //     }
-    // };
     Node root = eval(ast.getRoot(), n, v);
     return syntax_tree::AST(root);
 }
@@ -361,12 +346,40 @@ Node Emulator::assoc(Identifier id, Matrix& n, Matrix& v) {
     throw std::runtime_error("Assoc: variable '" + id_value + "' not found");
 }
 
-Node Emulator::evalFuncCall(Node lambda, Matrix& n, Matrix& v) {
-    auto expr = lambda->getStatement(0);
-    if (auto list = std::dynamic_pointer_cast<syntax_tree::ListNode>(expr)) {
-        return Node();
+Node Emulator::evalFuncCall(Node func, Matrix& n, Matrix& v) {
+    if (auto list = std::dynamic_pointer_cast<syntax_tree::ListNode>(func)) {
+        if (list->getStatementCount() == 0) {
+            throw std::runtime_error("Empty function call");
+        }
+        
+        // (e1 ... ek)
+        std::vector<std::shared_ptr<syntax_tree::ASTNode>> evaluated_args;
+        std::vector<std::shared_ptr<syntax_tree::ASTNode>> arg_names;
+        for (int i = 1; i < list->getStatementCount(); i++) {
+            auto statement = list->getStatement(i);
+            auto evaluated_arg = eval(statement, n, v);
+            arg_names.push_back(statement);
+            evaluated_args.push_back(evaluated_arg);
+        }
+
+        // nv refresh
+        n.insert(n.begin(), arg_names);
+        v.insert(v.begin(), evaluated_args);
+        
+        // e0
+        auto func_closure_node = eval(list->getStatement(0), n, v);
+
+        if (auto closure = std::dynamic_pointer_cast<syntax_tree::FuncClosureNode>(func_closure_node)) {
+            if (closure->getStatementCount() != func->getStatementCount()) {
+                throw std::runtime_error("Function call: params count error");
+            }
+            //return applyClosure(closure, evaluated_args, n, v);
+            return closure;
+        } else {
+            throw std::runtime_error("Function call: first element must be a closure");
+        }
     }
     else {
-        return eval(expr, n, v);
+        return eval(func, n, v);
     }
 }
