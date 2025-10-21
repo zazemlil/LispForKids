@@ -306,10 +306,14 @@ Node Emulator::matrixToListNode(const Matrix& matrix) {
 }
 
 FuncClosureNode Emulator::evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v) {
+    int size = lambda->getStatementCount();
     auto params = std::make_shared<syntax_tree::ListNode>("LIST");
-    params->addStatement(lambda->getStatement(0));  
+    for (int i = 0; i < size-1; i++) {
+        params->addStatement(lambda->getStatement(i));  
+    }
+    
     auto body = std::make_shared<syntax_tree::ListNode>("LIST");
-    body->addStatement(lambda->getStatement(1));    
+    body->addStatement(lambda->getStatement(size-1));    
     
     // (n v) = cons(n, cons(v, nil))
     auto context_list = std::make_shared<syntax_tree::ListNode>("CONTEXT");
