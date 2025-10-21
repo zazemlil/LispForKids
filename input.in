@@ -1,4 +1,6 @@
 (
-    cond A (rem B B) (add B B)
+    quote A
 )
+
+# контекст работает! нужно: evalFuncCall, evalLet, evalLetrec + разобраться как вычисляется closure
 
