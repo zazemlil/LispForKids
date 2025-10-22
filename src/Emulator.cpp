@@ -2,25 +2,11 @@
 #include <iostream>
 
 syntax_tree::AST Emulator::eval(syntax_tree::AST ast) {
-    Matrix n;
-    // {
-    //     {
-    //         std::make_shared<syntax_tree::Identifier>("Identifier", "A"),
-    //         std::make_shared<syntax_tree::Identifier>("Identifier", "B")
-    //     }
-    // };
-    Matrix v;
-    // {
-    //     {
-    //         std::make_shared<syntax_tree::LiteralBool>("LiteralBool", false),
-    //         std::make_shared<syntax_tree::LiteralInt>("LiteralInt", 1)
-    //     }
-    // };
-    Node root = eval(ast.getRoot(), n, v);
+    Node root = eval(ast.getRoot(), {}, {});
     return syntax_tree::AST(root);
 }
 
-Node Emulator::eval(Node e, Matrix& n, Matrix& v) {
+Node Emulator::eval(Node e, Matrix n, Matrix v) {
     if (auto litInt = std::dynamic_pointer_cast<syntax_tree::LiteralInt>(e)) {
         return evalLiteralInt(litInt, n, v);
     }
@@ -88,27 +74,27 @@ Node Emulator::eval(Node e, Matrix& n, Matrix& v) {
     throw std::runtime_error("Unknown node type");
 }
 
-LiteralInt Emulator::evalLiteralInt(LiteralInt litInt, Matrix& n, Matrix& v) {
+LiteralInt Emulator::evalLiteralInt(LiteralInt litInt, Matrix n, Matrix v) {
     return litInt;
 }
 
-LiteralNil Emulator::evalLiteralNil(LiteralNil litNil, Matrix& n, Matrix& v) {
+LiteralNil Emulator::evalLiteralNil(LiteralNil litNil, Matrix n, Matrix v) {
     return litNil;
 }
 
-LiteralBool Emulator::evalLiteralBool(LiteralBool litBool, Matrix& n, Matrix& v) {
+LiteralBool Emulator::evalLiteralBool(LiteralBool litBool, Matrix n, Matrix v) {
     return litBool;
 }
 
-Node Emulator::evalIdentifier(Identifier id, Matrix& n, Matrix& v) {
+Node Emulator::evalIdentifier(Identifier id, Matrix n, Matrix v) {
     return assoc(id, n, v);
 }
 
-Node Emulator::evalQuoteNode(QuoteNode quote, Matrix& n, Matrix& v) {
+Node Emulator::evalQuoteNode(QuoteNode quote, Matrix n, Matrix v) {
     return quote->getStatement(0);
 }
 
-Node Emulator::evalCarNode(CarNode car, Matrix& n, Matrix& v) {
+Node Emulator::evalCarNode(CarNode car, Matrix n, Matrix v) {
     auto c = eval(car->getStatement(0), n, v);
     
     if (auto nil = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(c)) {
@@ -123,7 +109,7 @@ Node Emulator::evalCarNode(CarNode car, Matrix& n, Matrix& v) {
     throw std::runtime_error("Car error!");
 }
 
-Node Emulator::evalCdrNode(CdrNode cdr, Matrix& n, Matrix& v) {
+Node Emulator::evalCdrNode(CdrNode cdr, Matrix n, Matrix v) {
     auto c = eval(cdr->getStatement(0), n, v);
     
     if (auto nil = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(c)) {
@@ -141,7 +127,7 @@ Node Emulator::evalCdrNode(CdrNode cdr, Matrix& n, Matrix& v) {
     throw std::runtime_error("Cdr error!");
 }
 
-Node Emulator::evalAtomNode(AtomNode atom, Matrix& n, Matrix& v) {
+Node Emulator::evalAtomNode(AtomNode atom, Matrix n, Matrix v) {
     auto arg = eval(atom->getStatement(0), n, v);
     
     // true если аргумент атомарный (не список)
@@ -150,7 +136,7 @@ Node Emulator::evalAtomNode(AtomNode atom, Matrix& n, Matrix& v) {
     return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", is_atom);
 }
 
-LiteralInt Emulator::evalAddNode(AddNode add, Matrix& n, Matrix& v) {
+LiteralInt Emulator::evalAddNode(AddNode add, Matrix n, Matrix v) {
     auto left = eval(add->getStatement(0), n, v);
     auto right = eval(add->getStatement(1), n, v);
 
@@ -162,7 +148,7 @@ LiteralInt Emulator::evalAddNode(AddNode add, Matrix& n, Matrix& v) {
     throw std::runtime_error("Add operation requires integer operands");
 }
 
-LiteralInt Emulator::evalSubNode(SubNode sub, Matrix& n, Matrix& v) {
+LiteralInt Emulator::evalSubNode(SubNode sub, Matrix n, Matrix v) {
     auto left = eval(sub->getStatement(0), n, v);
     auto right = eval(sub->getStatement(1), n, v);
 
@@ -174,7 +160,7 @@ LiteralInt Emulator::evalSubNode(SubNode sub, Matrix& n, Matrix& v) {
     throw std::runtime_error("Sub operation requires integer operands");
 }
 
-LiteralInt Emulator::evalMulNode(MulNode mul, Matrix& n, Matrix& v) {
+LiteralInt Emulator::evalMulNode(MulNode mul, Matrix n, Matrix v) {
     auto left = eval(mul->getStatement(0), n, v);
     auto right = eval(mul->getStatement(1), n, v);
 
@@ -186,7 +172,7 @@ LiteralInt Emulator::evalMulNode(MulNode mul, Matrix& n, Matrix& v) {
     throw std::runtime_error("Mul operation requires integer operands");
 }
 
-LiteralInt Emulator::evalDiveNode(DiveNode dive, Matrix& n, Matrix& v) {
+LiteralInt Emulator::evalDiveNode(DiveNode dive, Matrix n, Matrix v) {
     auto left = eval(dive->getStatement(0), n, v);
     auto right = eval(dive->getStatement(1), n, v);
 
@@ -198,7 +184,7 @@ LiteralInt Emulator::evalDiveNode(DiveNode dive, Matrix& n, Matrix& v) {
     throw std::runtime_error("Dive operation requires integer operands");
 }
 
-LiteralInt Emulator::evalRemNode(RemNode rem, Matrix& n, Matrix& v) {
+LiteralInt Emulator::evalRemNode(RemNode rem, Matrix n, Matrix v) {
     auto left = eval(rem->getStatement(0), n, v);
     auto right = eval(rem->getStatement(1), n, v);
 
@@ -210,7 +196,7 @@ LiteralInt Emulator::evalRemNode(RemNode rem, Matrix& n, Matrix& v) {
     throw std::runtime_error("Rem operation requires integer operands");
 }
 
-LiteralBool Emulator::evalLeNode(LeNode le, Matrix& n, Matrix& v) {
+LiteralBool Emulator::evalLeNode(LeNode le, Matrix n, Matrix v) {
     auto left = eval(le->getStatement(0), n, v);
     auto right = eval(le->getStatement(1), n, v);
 
@@ -227,7 +213,7 @@ LiteralBool Emulator::evalLeNode(LeNode le, Matrix& n, Matrix& v) {
     throw std::runtime_error("Le operation requires integer operands");
 }
 
-ListNode Emulator::evalConsNode(ConsNode cons, Matrix& n, Matrix& v) {
+ListNode Emulator::evalConsNode(ConsNode cons, Matrix n, Matrix v) {
     auto left = eval(cons->getStatement(0), n, v);
     auto right = eval(cons->getStatement(1), n, v);
 
@@ -244,7 +230,7 @@ ListNode Emulator::evalConsNode(ConsNode cons, Matrix& n, Matrix& v) {
     throw std::runtime_error("Cons error!");
 }
 
-LiteralBool Emulator::evalEqualNode(EqualNode equal, Matrix& n, Matrix& v) {
+LiteralBool Emulator::evalEqualNode(EqualNode equal, Matrix n, Matrix v) {
     auto left = eval(equal->getStatement(0), n, v);
     auto right = eval(equal->getStatement(1), n, v);
 
@@ -277,7 +263,7 @@ LiteralBool Emulator::evalEqualNode(EqualNode equal, Matrix& n, Matrix& v) {
     throw std::runtime_error("Equal operation requires 1 or 2 atom operands");
 }
 
-Node Emulator::evalCondNode(CondNode cond, Matrix& n, Matrix& v) {
+Node Emulator::evalCondNode(CondNode cond, Matrix n, Matrix v) {
     auto expr = eval(cond->getStatement(0), n, v); 
     auto left = eval(cond->getStatement(1), n, v);
     auto right = eval(cond->getStatement(2), n, v);
@@ -294,7 +280,7 @@ Node Emulator::evalCondNode(CondNode cond, Matrix& n, Matrix& v) {
     throw std::runtime_error("Cond error!");
 }
 
-Node Emulator::matrixToListNode(const Matrix& matrix) {
+Node Emulator::matrixToListNode(const Matrix matrix) {
     auto matrix_list = std::make_shared<syntax_tree::ListNode>("LIST");
     
     for (const auto& row : matrix) {
@@ -308,7 +294,7 @@ Node Emulator::matrixToListNode(const Matrix& matrix) {
     return matrix_list;
 }
 
-FuncClosureNode Emulator::evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v) {
+FuncClosureNode Emulator::evalLambdaNode(LambdaNode lambda, Matrix n, Matrix v) {
     int size = lambda->getStatementCount();
     auto params = std::make_shared<syntax_tree::ListNode>("LIST");
     for (int i = 0; i < size-1; i++) {
@@ -335,7 +321,7 @@ FuncClosureNode Emulator::evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v
     return closure;
 }
 
-Node Emulator::assoc(Identifier id, Matrix& n, Matrix& v) {
+Node Emulator::assoc(Identifier id, Matrix n, Matrix v) {
     auto id_value = id->getValue();
     
     if (n.size() != v.size()) {
@@ -362,50 +348,35 @@ Node Emulator::assoc(Identifier id, Matrix& n, Matrix& v) {
     throw std::runtime_error("Assoc: variable '" + id_value + "' not found");
 }
 
-Node Emulator::evalFuncCall(Node func, Matrix& n, Matrix& v) {
-    if (auto list = std::dynamic_pointer_cast<syntax_tree::ListNode>(func)) {
-        if (list->getStatementCount() == 0) {
-            throw std::runtime_error("Empty function call");
-        }
-        
-        // (e1 ... ek)
-        std::vector<std::shared_ptr<syntax_tree::ASTNode>> evaluated_args;
-        std::vector<std::shared_ptr<syntax_tree::ASTNode>> arg_names;
-        for (int i = 1; i < list->getStatementCount(); i++) {
-            auto statement = list->getStatement(i);
-            auto evaluated_arg = eval(statement, n, v);
-            arg_names.push_back(statement);
-            evaluated_args.push_back(evaluated_arg);
-        }
-
-        // nv refresh
-        // n.insert(n.begin(), arg_names);
-        // v.insert(v.begin(), evaluated_args);
-        // printMatrix(n, v);
-
-        // e0
-        auto func_closure_node = eval(list->getStatement(0), n, v);
-
-        if (auto closure = std::dynamic_pointer_cast<syntax_tree::FuncClosureNode>(func_closure_node)) {
-            if (closure->getStatement(0)->getStatement(0)->getStatementCount() != func->getStatementCount()-1) {
-                throw std::runtime_error("Function call: params count error");
-            }
-            auto closure_arg_names = closure->getStatement(0)->getStatement(0)->getStatements();
-            closure->getStatement(1)->getStatement(0)->addStatements(closure_arg_names);
-            closure->getStatement(1)->getStatement(1)->addStatements(evaluated_args);
-            
-            return evalClosure(closure, n, v);
-        } else {
-            throw std::runtime_error("Function call: first element must be a closure");
-        }
+Node Emulator::evalFuncCall(ListNode list, Matrix n, Matrix v) {
+    // (e1 ... ek)
+    std::vector<std::shared_ptr<syntax_tree::ASTNode>> evaluated_args;
+    std::vector<std::shared_ptr<syntax_tree::ASTNode>> arg_names;
+    for (int i = 1; i < list->getStatementCount(); i++) {
+        auto statement = list->getStatement(i);
+        auto evaluated_arg = eval(statement, n, v);
+        arg_names.push_back(statement);
+        evaluated_args.push_back(evaluated_arg);
     }
-    else {
-        return eval(func, n, v);
+
+    // e0
+    auto func_closure_node = eval(list->getStatement(0), n, v);
+
+    if (auto closure = std::dynamic_pointer_cast<syntax_tree::FuncClosureNode>(func_closure_node)) {
+        if (closure->getStatement(0)->getStatement(0)->getStatementCount() != list->getStatementCount()-1) {
+            throw std::runtime_error("Function call: params count error");
+        }
+        auto closure_arg_names = closure->getStatement(0)->getStatement(0)->getStatements();
+        closure->getStatement(1)->getStatement(0)->addStatements(closure_arg_names);
+        closure->getStatement(1)->getStatement(1)->addStatements(evaluated_args);
+
+        return evalClosure(closure, {}, {});
+    } else {
+        throw std::runtime_error("Function call: first element must be a closure");
     }
-    throw std::runtime_error("Function call: error");
 }
 
-Node Emulator::evalLetNode(LetNode let, Matrix& n, Matrix& v) {
+Node Emulator::evalLetNode(LetNode let, Matrix n, Matrix v) {
     auto expr = let->getStatement(0);
 
     // (e1 ... ek)
@@ -419,56 +390,24 @@ Node Emulator::evalLetNode(LetNode let, Matrix& n, Matrix& v) {
     }
 
     // nv refresh
-    //n.insert(n.begin(), arg_names);
-    //v.insert(v.begin(), evaluated_args);
-
-    //let->getStatement(1)->print();
-    Matrix local_n = {arg_names}; //
-    Matrix local_v = {evaluated_args}; //
-    
-    //printMatrix(local_n, local_v);
-
-    auto result = evalFuncCall(expr, local_n, local_v);
-
-    return result;
-}
-
-Node Emulator::evalLetrecNode(LetrecNode letrec, Matrix& n, Matrix& v) {
-    auto expr = letrec->getStatement(0);
-
-    // (e1 ... ek)
-    std::vector<std::shared_ptr<syntax_tree::ASTNode>> evaluated_args;
-    std::vector<std::shared_ptr<syntax_tree::ASTNode>> arg_names;
-    for (int i = 1; i < letrec->getStatementCount(); i++) {
-        auto statement = letrec->getStatement(i);
-        auto evaluated_arg = eval(statement->getStatement(1), n, v);
-        arg_names.push_back(statement->getStatement(0));
-        evaluated_args.push_back(evaluated_arg);
-    }
-
-    // nv refresh
     n.insert(n.begin(), arg_names);
     v.insert(v.begin(), evaluated_args);
 
-    auto result = evalFuncCall(expr, n, v);
-
-    return result;
+    return eval(expr, n, v);
 }
 
-Node Emulator::evalClosure(FuncClosureNode closure, Matrix& n, Matrix& v) {
-    // это должно быть в evalLet, а в evalLetrec будет рекурсивный контекст
-    Matrix local_n = {closure->getStatement(1)->getStatement(0)->getStatements()}; //
-    Matrix local_v = {closure->getStatement(1)->getStatement(1)->getStatements()}; //
-    
-    local_n.insert(local_n.end(), n.begin(), n.end());
-    local_v.insert(local_v.end(), v.begin(), v.end());
-    
-    //printMatrix(local_n, local_v);
+Node Emulator::evalLetrecNode(LetrecNode letrec, Matrix n, Matrix v) {
+    return Node();
+}
+
+Node Emulator::evalClosure(FuncClosureNode closure, Matrix n, Matrix v) {
+    Matrix local_n = {closure->getStatement(1)->getStatement(0)->getStatements()};
+    Matrix local_v = {closure->getStatement(1)->getStatement(1)->getStatements()};
 
     return eval(closure->getStatement(0)->getStatement(1), local_n, local_v);
 }
 
-void Emulator::printMatrix(Matrix& n, Matrix& v) {
+void Emulator::printMatrix(Matrix n, Matrix v) {
     std::cout << "[";
     for (size_t i = 0; i < n.size(); ++i) {
         const auto& names_row = n[i];
