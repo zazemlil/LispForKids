@@ -1,15 +1,6 @@
-(let
-    (f y y) 
-    (f 
-        (
-            lambda (a b) (
-                    equal a b
-            )
-        )
-    )
-    (x (add 1 2))
-    (y (quote ()))
+(
+    lambda (x) (add 1 2)
 )
 
-# evalLetrec + equal для bool значений и quote() - NIL
+# evalLetrec
 
