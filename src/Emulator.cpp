@@ -24,10 +24,10 @@ Node Emulator::eval(Node e, Matrix& n, Matrix& v) {
     if (auto litInt = std::dynamic_pointer_cast<syntax_tree::LiteralInt>(e)) {
         return evalLiteralInt(litInt, n, v);
     }
-    if (auto litBool = std::dynamic_pointer_cast<syntax_tree::LiteralBool>(e)) {
+    else if (auto litBool = std::dynamic_pointer_cast<syntax_tree::LiteralBool>(e)) {
         return evalLiteralBool(litBool, n, v);
     }
-    if (auto litNil = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(e)) {
+    else if (auto litNil = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(e)) {
         return evalLiteralNil(litNil, n, v);
     }
     else if (auto id = std::dynamic_pointer_cast<syntax_tree::Identifier>(e)) {
@@ -307,19 +307,17 @@ FuncClosureNode Emulator::evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v
     auto params = std::make_shared<syntax_tree::ListNode>("LIST");
     for (int i = 0; i < size-1; i++) {
         params->addStatement(lambda->getStatement(i));  
-    }
-    
-    auto body = std::make_shared<syntax_tree::ListNode>("LIST");
-    body->addStatement(lambda->getStatement(size-1));    
+    }  
+    auto body = lambda->getStatement(size-1);
     
     // (n v) = cons(n, cons(v, nil))
-    auto context_list = std::make_shared<syntax_tree::ListNode>("CONTEXT");
+    auto context_list = std::make_shared<syntax_tree::ListNode>("LIST"); // CONTEXT
 
     context_list->addStatement(matrixToListNode(n)); 
     context_list->addStatement(matrixToListNode(v));
     
     // (y e) = cons(y, cons(e, nil))
-    auto function_part = std::make_shared<syntax_tree::ListNode>("FUNCTION_PART");
+    auto function_part = std::make_shared<syntax_tree::ListNode>("LIST"); // FUNCTION_PART
     function_part->addStatement(params); 
     function_part->addStatement(body);
     
@@ -441,5 +439,5 @@ Node Emulator::evalClosure(FuncClosureNode closure, Matrix& n, Matrix& v) {
     //     std::cout << "---\n";
     // }
 
-    return eval(closure->getStatement(0)->getStatement(1)->getStatement(0), local_n, local_v);
+    return eval(closure->getStatement(0)->getStatement(1), local_n, local_v);
 }

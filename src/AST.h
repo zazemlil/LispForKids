@@ -110,7 +110,20 @@ class CondNode : public ASTNode { public: CondNode(std::string t) : ASTNode(t) {
 
 // other Nodes
 class LambdaNode : public ASTNode { public: LambdaNode(std::string t) : ASTNode(t) {} };
-class FuncClosureNode : public ASTNode { public: FuncClosureNode(std::string t) : ASTNode(t) {} };
+class FuncClosureNode : public ASTNode { 
+public: 
+    FuncClosureNode(std::string t) : ASTNode(t) {} 
+    void printFlat(int depth = 0) const override {
+        std::cout << "(";
+        if (!getStatements().empty()) {
+            for (const auto& stmt : getStatements()) {
+                std::cout << " ";
+                stmt->printFlat(depth);
+            }
+        }
+        std::cout << ")";
+    }
+};
 class LetNode : public ASTNode { public: LetNode(std::string t) : ASTNode(t) {} };
 class LetrecNode : public ASTNode { public: LetrecNode(std::string t) : ASTNode(t) {} };
 
