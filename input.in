@@ -1,5 +1,11 @@
 (
-    lambda (x) (add 1 2)
+    let (f (quote 2))
+        (f (
+            lambda (n) (add (mul (ff n) 2) 1 )
+        ))
+        (ff (
+            lambda (a) (mul a 2)
+        ))
 )
 
 # evalLetrec

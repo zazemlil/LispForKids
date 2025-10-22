@@ -78,6 +78,12 @@ Node Emulator::eval(Node e, Matrix& n, Matrix& v) {
     else if (auto let = std::dynamic_pointer_cast<syntax_tree::LetNode>(e)) {
         return evalLetNode(let, n, v);
     }
+    else if (auto letrec = std::dynamic_pointer_cast<syntax_tree::LetrecNode>(e)) {
+        return evalLetrecNode(letrec, n, v);
+    }
+    else if (auto list = std::dynamic_pointer_cast<syntax_tree::ListNode>(e)) {
+        return evalFuncCall(list, n, v);
+    }
 
     throw std::runtime_error("Unknown node type");
 }
@@ -375,6 +381,7 @@ Node Emulator::evalFuncCall(Node func, Matrix& n, Matrix& v) {
         // nv refresh
         // n.insert(n.begin(), arg_names);
         // v.insert(v.begin(), evaluated_args);
+        // printMatrix(n, v);
 
         // e0
         auto func_closure_node = eval(list->getStatement(0), n, v);
@@ -412,6 +419,34 @@ Node Emulator::evalLetNode(LetNode let, Matrix& n, Matrix& v) {
     }
 
     // nv refresh
+    //n.insert(n.begin(), arg_names);
+    //v.insert(v.begin(), evaluated_args);
+
+    //let->getStatement(1)->print();
+    Matrix local_n = {arg_names}; //
+    Matrix local_v = {evaluated_args}; //
+    
+    //printMatrix(local_n, local_v);
+
+    auto result = evalFuncCall(expr, local_n, local_v);
+
+    return result;
+}
+
+Node Emulator::evalLetrecNode(LetrecNode letrec, Matrix& n, Matrix& v) {
+    auto expr = letrec->getStatement(0);
+
+    // (e1 ... ek)
+    std::vector<std::shared_ptr<syntax_tree::ASTNode>> evaluated_args;
+    std::vector<std::shared_ptr<syntax_tree::ASTNode>> arg_names;
+    for (int i = 1; i < letrec->getStatementCount(); i++) {
+        auto statement = letrec->getStatement(i);
+        auto evaluated_arg = eval(statement->getStatement(1), n, v);
+        arg_names.push_back(statement->getStatement(0));
+        evaluated_args.push_back(evaluated_arg);
+    }
+
+    // nv refresh
     n.insert(n.begin(), arg_names);
     v.insert(v.begin(), evaluated_args);
 
@@ -421,23 +456,31 @@ Node Emulator::evalLetNode(LetNode let, Matrix& n, Matrix& v) {
 }
 
 Node Emulator::evalClosure(FuncClosureNode closure, Matrix& n, Matrix& v) {
-    Matrix local_n = {closure->getStatement(1)->getStatement(0)->getStatements()};
-    Matrix local_v = {closure->getStatement(1)->getStatement(1)->getStatements()};
-
+    // это должно быть в evalLet, а в evalLetrec будет рекурсивный контекст
+    Matrix local_n = {closure->getStatement(1)->getStatement(0)->getStatements()}; //
+    Matrix local_v = {closure->getStatement(1)->getStatement(1)->getStatements()}; //
+    
     local_n.insert(local_n.end(), n.begin(), n.end());
     local_v.insert(local_v.end(), v.begin(), v.end());
-
-    // for (size_t i = 0; i < local_n.size(); ++i) {
-    //     const auto& names_row = local_n[i];
-    //     const auto& values_row = local_v[i];
-        
-    //     for (size_t j = 0; j < names_row.size(); ++j) {
-    //         names_row[j]->print();
-    //         values_row[j]->print();
-    //         std::cout << "\n";
-    //     }
-    //     std::cout << "---\n";
-    // }
+    
+    //printMatrix(local_n, local_v);
 
     return eval(closure->getStatement(0)->getStatement(1), local_n, local_v);
+}
+
+void Emulator::printMatrix(Matrix& n, Matrix& v) {
+    std::cout << "[";
+    for (size_t i = 0; i < n.size(); ++i) {
+        const auto& names_row = n[i];
+        const auto& values_row = v[i];
+        std::cout << "\n\t{";
+        for (size_t j = 0; j < names_row.size(); ++j) {
+            std::cout << "\n\t\t";
+            names_row[j]->printFlat();
+            std::cout << " = ";
+            values_row[j]->printFlat();
+        }
+        std::cout << "\n\t}";
+    }
+    std::cout << "\n]\n";
 }

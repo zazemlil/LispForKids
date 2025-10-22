@@ -26,6 +26,7 @@ typedef std::shared_ptr<syntax_tree::CondNode> CondNode;
 typedef std::shared_ptr<syntax_tree::LambdaNode> LambdaNode;
 typedef std::shared_ptr<syntax_tree::FuncClosureNode> FuncClosureNode;
 typedef std::shared_ptr<syntax_tree::LetNode> LetNode;
+typedef std::shared_ptr<syntax_tree::LetrecNode> LetrecNode;
 
 class Emulator {
 private:
@@ -59,11 +60,13 @@ private:
     FuncClosureNode evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v);
     Node evalFuncCall(Node func, Matrix& n, Matrix& v);
     Node evalLetNode(LetNode let, Matrix& n, Matrix& v);
+    Node evalLetrecNode(LetrecNode letrec, Matrix& n, Matrix& v);
     Node evalClosure(FuncClosureNode closure, Matrix& n, Matrix& v);
 
     //auxiliary functions
     Node matrixToListNode(const Matrix& matrix);
     Node assoc(Identifier id, Matrix& n, Matrix& v);
+    void printMatrix(Matrix& n, Matrix& v);
 
 public:
     syntax_tree::AST eval(syntax_tree::AST ast);

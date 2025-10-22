@@ -83,7 +83,7 @@ application: unaryop expr { $1->addStatement($2); $$ = $1; }
         $$ = l;
     }
     | T_LETREC expr bindings {
-        auto l = std::make_shared<syntax_tree::ASTNode>("LETREC");
+        auto l = std::make_shared<syntax_tree::LetrecNode>("LETREC");
         l->addStatement($2);
         l->addStatements($3); 
         $$ = l;
