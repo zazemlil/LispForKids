@@ -371,11 +371,14 @@ Node Emulator::evalFuncCall(ListNode list, Matrix& n, Matrix& v) {
 
         Matrix new_n = {};//
         Matrix new_v = {};//
-        new_n.insert(new_n.begin(), closure->getStatement(1)->getStatement(0)->getStatements());//
-        new_v.insert(new_v.begin(), closure->getStatement(1)->getStatement(1)->getStatements());//
-        closure->print();
         new_n.insert(new_n.begin(), closure_arg_names); //
         new_v.insert(new_v.begin(), evaluated_args); //
+
+        new_n.insert(new_n.begin(), closure->getStatement(1)->getStatement(0)->getStatements());//
+        new_v.insert(new_v.begin(), closure->getStatement(1)->getStatement(1)->getStatements());//
+
+        
+        
 
         //n.insert(n.begin(), closure_arg_names); // не подходит для let
         //v.insert(v.begin(), evaluated_args); // не подходит для let
