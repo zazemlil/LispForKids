@@ -19,11 +19,11 @@ public:
     std::string getNodeType() const { return node_type; }
     size_t getStatementCount() const { return statements.size(); }
 
-    std::shared_ptr<ASTNode> getStatement(size_t index) const { return statements.at(index); }
+    std::shared_ptr<ASTNode>& getStatement(size_t index) { return statements.at(index); }
     void addStatement(std::shared_ptr<ASTNode> stmt) { statements.push_back(stmt); }
 
     void setStatements(std::vector<std::shared_ptr<ASTNode>> new_statements) { this->statements = new_statements; }
-    std::vector<std::shared_ptr<ASTNode>> getStatements() const { return statements; }
+    std::vector<std::shared_ptr<ASTNode>>& getStatements() { return statements; }
     
     void addStatements(std::vector<std::shared_ptr<ASTNode>> new_statements) {
         this->statements.insert(
@@ -48,7 +48,7 @@ public:
         }
     }
 
-    virtual void printFlat(int depth = 0) const {
+    virtual void printFlat(int depth = 0) {
         if (!statements.empty()) {
             std::cout << "(";
         }
@@ -113,7 +113,7 @@ class LambdaNode : public ASTNode { public: LambdaNode(std::string t) : ASTNode(
 class FuncClosureNode : public ASTNode { 
 public: 
     FuncClosureNode(std::string t) : ASTNode(t) {} 
-    void printFlat(int depth = 0) const override {
+    void printFlat(int depth = 0) override {
         std::cout << "(";
         if (!getStatements().empty()) {
             for (const auto& stmt : getStatements()) {
@@ -150,7 +150,7 @@ public:
 class ListNode : public ASTNode { 
 public: 
     ListNode(std::string t) : ASTNode(t) {}
-    void printFlat(int depth = 0) const override {
+    void printFlat(int depth = 0) override {
         std::cout << "(";
         if (!getStatements().empty()) {
             for (const auto& stmt : getStatements()) {

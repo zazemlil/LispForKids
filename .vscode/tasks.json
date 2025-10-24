@@ -1,0 +1,46 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Generate Parser and Lexer",
+            "command": "cd build && bison -d -Wcounterexamples ../src/grammar.y && flex ../src/lexer.l",
+            "group": "build"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Build Linux Debug",
+            "command": "/usr/bin/g++",
+            "args": [
+                "-std=c++17",
+                "-Isrc",
+                "-g",
+                "-fdiagnostics-color=always",
+                "src/main.cpp",
+                "src/Emulator.cpp",
+                "build/Parser.cpp",
+                "build/Scanner.cpp",
+                "-o",
+                "build/linux/main"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": "Generate Parser and Lexer",
+            "detail": "Build debug version for Linux"
+        },
+        {
+            "type": "shell",
+            "label": "Clean Build",
+            "command": "rm -rf build && mkdir -p build/linux",
+            "group": "build"
+        }
+    ],
+    "version": "2.0.0"
+}

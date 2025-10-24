@@ -30,43 +30,45 @@ typedef std::shared_ptr<syntax_tree::LetrecNode> LetrecNode;
 
 class Emulator {
 private:
-    Node eval(Node e, Matrix n, Matrix v);
+    Node eval(Node e, Matrix& n, Matrix& v);
 
-    LiteralInt evalLiteralInt(LiteralInt litInt, Matrix n, Matrix v);
-    LiteralNil evalLiteralNil(LiteralNil litNil, Matrix n, Matrix v);
-    LiteralBool evalLiteralBool(LiteralBool litBool, Matrix n, Matrix v);
-    Node evalIdentifier(Identifier id, Matrix n, Matrix v);
+    LiteralInt evalLiteralInt(LiteralInt litInt, Matrix& n, Matrix& v);
+    LiteralNil evalLiteralNil(LiteralNil litNil, Matrix& n, Matrix& v);
+    LiteralBool evalLiteralBool(LiteralBool litBool, Matrix& n, Matrix& v);
+    Node evalIdentifier(Identifier id, Matrix& n, Matrix& v);
 
     // unary
-    Node evalQuoteNode(QuoteNode quote, Matrix n, Matrix v);
-    Node evalCarNode(CarNode car, Matrix n, Matrix v);
-    Node evalCdrNode(CdrNode cdr, Matrix n, Matrix v);
-    Node evalAtomNode(AtomNode atom, Matrix n, Matrix v);
+    Node evalQuoteNode(QuoteNode quote, Matrix& n, Matrix& v);
+    Node evalCarNode(CarNode car, Matrix& n, Matrix& v);
+    Node evalCdrNode(CdrNode cdr, Matrix& n, Matrix& v);
+    Node evalAtomNode(AtomNode atom, Matrix& n, Matrix& v);
 
     // binary
-    LiteralInt evalAddNode(AddNode add, Matrix n, Matrix v);
-    LiteralInt evalSubNode(SubNode sub, Matrix n, Matrix v);
-    LiteralInt evalMulNode(MulNode mul, Matrix n, Matrix v);
-    LiteralInt evalDiveNode(DiveNode dive, Matrix n, Matrix v);
-    LiteralInt evalRemNode(RemNode rem, Matrix n, Matrix v);
-    LiteralBool evalLeNode(LeNode le, Matrix n, Matrix v);
-    ListNode evalConsNode(ConsNode cons, Matrix n, Matrix v);
-    LiteralBool evalEqualNode(EqualNode equal, Matrix n, Matrix v);
+    LiteralInt evalAddNode(AddNode add, Matrix& n, Matrix& v);
+    LiteralInt evalSubNode(SubNode sub, Matrix& n, Matrix& v);
+    LiteralInt evalMulNode(MulNode mul, Matrix& n, Matrix& v);
+    LiteralInt evalDiveNode(DiveNode dive, Matrix& n, Matrix& v);
+    LiteralInt evalRemNode(RemNode rem, Matrix& n, Matrix& v);
+    LiteralBool evalLeNode(LeNode le, Matrix& n, Matrix& v);
+    ListNode evalConsNode(ConsNode cons, Matrix& n, Matrix& v);
+    LiteralBool evalEqualNode(EqualNode equal, Matrix& n, Matrix& v);
 
     // ternary
-    Node evalCondNode(CondNode cond, Matrix n, Matrix v);
+    Node evalCondNode(CondNode cond, Matrix& n, Matrix& v);
 
     //other
-    FuncClosureNode evalLambdaNode(LambdaNode lambda, Matrix n, Matrix v);
-    Node evalFuncCall(ListNode list, Matrix n, Matrix v);
-    Node evalLetNode(LetNode let, Matrix n, Matrix v);
-    Node evalLetrecNode(LetrecNode letrec, Matrix n, Matrix v);
-    Node evalClosure(FuncClosureNode closure, Matrix n, Matrix v);
+    FuncClosureNode evalLambdaNode(LambdaNode lambda, Matrix& n, Matrix& v);
+    Node evalFuncCall(ListNode list, Matrix& n, Matrix& v);
+    Node evalLetNode(LetNode let, Matrix& n, Matrix& v);
+    Node evalLetrecNode(LetrecNode letrec, Matrix& n, Matrix& v);
+    Node evalClosure(FuncClosureNode closure, Matrix& n, Matrix& v);
 
     //auxiliary functions
-    Node matrixToListNode(const Matrix matrix);
-    Node assoc(Identifier id, Matrix n, Matrix v);
-    void printMatrix(Matrix n, Matrix v);
+    Node matrixToListNode(Matrix& matrix);
+    Node assoc(Identifier id, Matrix& n, Matrix& v);
+    Matrix& complete(Matrix& v, std::vector<std::shared_ptr<syntax_tree::ASTNode>>& z);
+    void printMatrixFlat(Matrix& n, Matrix& v);
+    void printMatrix(Matrix& n, Matrix& v);
 
 public:
     syntax_tree::AST eval(syntax_tree::AST ast);
