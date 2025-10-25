@@ -55,7 +55,12 @@ expr: atom { $$ = $1; }
 
 
 atom: id { $$ = $1; }
-    | num { $$ = $1; };
+    | num { $$ = $1; }
+    | unaryop { $$ = $1; }
+    | binaryop { $$ = $1; }
+    | ternaryop { $$ = $1; }
+    | T_LET { $$ = std::make_shared<syntax_tree::LetNode>("LET"); }
+    | T_LETREC { $$ = std::make_shared<syntax_tree::LetrecNode>("LETREC"); };
 
 
 list: expr list {
