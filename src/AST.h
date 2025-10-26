@@ -35,6 +35,20 @@ public:
 
     virtual void printValue() const { std::cout << node_type; }
 
+    void printRec(int deep, int maxDeep, int indent = 0) const {
+        std::string indentStr = ""; 
+        for (int i = 0; i < indent-1; i++) {indentStr += "    ";} 
+        
+        std::cout << indentStr << "";
+        this->printValue();
+        std::cout << '\n';
+        
+        if (deep <= maxDeep)
+        for (const auto& stmt : statements) {
+            stmt->printRec(deep+1, maxDeep, indent + 2);
+        }
+    }
+
     void print(int indent = 0) const {
         std::string indentStr = ""; 
         for (int i = 0; i < indent-1; i++) {indentStr += "    ";} 

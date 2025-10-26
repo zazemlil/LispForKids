@@ -3,7 +3,7 @@
         {
             "type": "shell",
             "label": "Generate Parser and Lexer",
-            "command": "cd build && bison -d -Wcounterexamples ../src/grammar.y && flex ../src/lexer.l",
+            "command": "cd build && bison -d ../src/grammar.y && flex ../src/lexer.l",
             "group": "build"
         },
         {

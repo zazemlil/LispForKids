@@ -366,35 +366,18 @@ Node Emulator::evalFuncCall(ListNode list, Matrix& n, Matrix& v) {
             throw std::runtime_error("Function call: params count error");
         }
         auto closure_arg_names = closure->getStatement(0)->getStatement(0)->getStatements();
-        // closure->getStatement(1)->getStatement(0)->addStatements(closure_arg_names); // для let!!!
-        // closure->getStatement(1)->getStatement(1)->addStatements(evaluated_args); // для let!!!
 
-        Matrix new_n = {};//
-        Matrix new_v = {};//
-        new_n.insert(new_n.begin(), closure_arg_names); //
-        new_v.insert(new_v.begin(), evaluated_args); //
+        Matrix new_n = {};
+        Matrix new_v = {};
+        new_n.insert(new_n.begin(), closure_arg_names);
+        new_v.insert(new_v.begin(), evaluated_args); 
 
-        new_n.insert(new_n.begin(), closure->getStatement(1)->getStatement(0)->getStatements());//
-        new_v.insert(new_v.begin(), closure->getStatement(1)->getStatement(1)->getStatements());//
-
-        
-        
-
-        //n.insert(n.begin(), closure_arg_names); // не подходит для let
-        //v.insert(v.begin(), evaluated_args); // не подходит для let
-
-        //return evalClosure(closure, {}, {}); // для let!!!
-
-        // closure->printFlat();
-        // std::cout << "\n";
-        // printMatrixFlat(n, v);
-        // std::cout << "\n";
-        // closure->getStatement(0)->getStatement(1)->printFlat();
-        // std::string s;
-        // std::cin >> s;
+        new_n.insert(new_n.begin(), closure->getStatement(1)->getStatement(0)->getStatements());
+        new_v.insert(new_v.begin(), closure->getStatement(1)->getStatement(1)->getStatements());
         
         return eval(closure->getStatement(0)->getStatement(1), new_n, new_v);
     } else {
+        func_closure_node->printRec(0, 5);
         throw std::runtime_error("Function call: first element must be a closure");
     }
 }
@@ -427,7 +410,7 @@ Node Emulator::evalLetrecNode(LetrecNode letrec, Matrix& n, Matrix& v) {
     for (int i = 1; i < letrec->getStatementCount(); i++) {
         auto statement = letrec->getStatement(i);
         variables_names.push_back(statement->getStatement(0));
-        auto evaluated_arg = std::make_shared<syntax_tree::ListNode>("OMEGA");
+        auto evaluated_arg = std::make_shared<syntax_tree::FuncClosureNode>("OMEGA");
         variables_values.push_back(evaluated_arg);
     }
     n.insert(n.begin(), variables_names); // n`
@@ -458,19 +441,17 @@ Node Emulator::evalLetrecNode(LetrecNode letrec, Matrix& n, Matrix& v) {
         z.push_back(evaluated_arg);
     }
     
-    // Complete
-    //v[0] = z;
-    
-    printMatrix(n, v);
     complete(v, z);
-    printMatrix(n, v);
 
     return eval(expr, n, v);
 }
 
 Matrix& Emulator::complete(Matrix& v, std::vector<std::shared_ptr<syntax_tree::ASTNode>>& z) {
     for (size_t i = 0; i < z.size(); i++) {
-        v[0][i] = z[i];
+        if (typeid(*v[0][i]) != typeid(*z[i])) {
+            throw std::runtime_error("Letrec: local definitions can only be closures.");
+        }
+        *v[0][i] = *z[i];
     }
     return v;
 }
