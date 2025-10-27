@@ -137,7 +137,12 @@ Node Emulator::evalCdrNode(CdrNode cdr, Matrix& n, Matrix& v) {
 Node Emulator::evalAtomNode(AtomNode atom, Matrix& n, Matrix& v) {
     auto arg = eval(atom->getStatement(0), n, v);
     
-    // true если аргумент атомарный (не список)
+    // если quote, то проверяем его агрумент на атомарность
+    auto quote = std::dynamic_pointer_cast<syntax_tree::QuoteNode>(arg);
+    if (quote) {
+        arg = quote->getStatement(0);
+    }
+    // true, если аргумент атомарный (не список)
     bool is_atom = (std::dynamic_pointer_cast<syntax_tree::ListNode>(arg) == nullptr);
     
     return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", is_atom);
