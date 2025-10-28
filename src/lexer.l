@@ -43,6 +43,9 @@ static int current_column = 1;
 [lL][aA][mM][bB][dD][aA] { yylval->emplace<std::string>("LAMBDA"); return Parser::token::T_LAMBDA; }
 [lL][eE][tT]             { yylval->emplace<std::string>("LET"); return Parser::token::T_LET; }
 [lL][eE][tT][rR][eE][cC] { yylval->emplace<std::string>("LETREC"); return Parser::token::T_LETREC; }
+[nN][iI][lL]             { yylval->emplace<std::string>("NIL"); return Parser::token::T_LITERAL_NIL; }
+[tT][rR][uU][eE] { yylval->emplace<std::string>("NIL"); return Parser::token::T_LITERAL_TRUE; }
+[fF][aA][lL][sS][eE] { yylval->emplace<std::string>("NIL"); return Parser::token::T_LITERAL_FALSE; }
 
 "(" { return Parser::token::T_PARENTHESIS_OPEN; }
 ")" { return Parser::token::T_PARENTHESIS_CLOSE; }

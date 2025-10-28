@@ -30,6 +30,7 @@
 
 %nonassoc <std::string> T_IDENTIFIER
 %nonassoc <int> T_LITERAL_INT
+%nonassoc T_LITERAL_NIL T_LITERAL_TRUE T_LITERAL_FALSE
 %nonassoc T_PARENTHESIS_OPEN T_PARENTHESIS_CLOSE
 %nonassoc T_END_OF_FILE
 
@@ -59,7 +60,10 @@ expr: atom { $$ = $1; }
 
 
 atom: id { $$ = $1; }
-    | num { $$ = $1; };
+    | num { $$ = $1; }
+    | T_LITERAL_NIL { $$ = std::make_shared<syntax_tree::LiteralNil>("NIL"); }
+    | T_LITERAL_TRUE { $$ = std::make_shared<syntax_tree::LiteralBool>("LiteralBool", true); }
+    | T_LITERAL_FALSE { $$ = std::make_shared<syntax_tree::LiteralBool>("LiteralBool", false); };
 
 list: expr list {
         auto l = std::make_shared<syntax_tree::ListNode>("LIST");
