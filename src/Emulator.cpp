@@ -267,6 +267,13 @@ LiteralBool Emulator::evalEqualNode(EqualNode equal, Matrix& n, Matrix& v) {
                 return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", true);
             }
         }
+        if (auto left_lit = std::dynamic_pointer_cast<syntax_tree::Identifier>(left)) {
+            if (auto right_lit = std::dynamic_pointer_cast<syntax_tree::Identifier>(right)) {
+                if (left_lit->getValue() == right_lit->getValue()) {
+                    return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", true);
+                }
+            }
+        }
         return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", false);
     }
 
