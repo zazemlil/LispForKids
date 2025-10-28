@@ -4,19 +4,31 @@ EXPR -> ATOM
         | "(" LIST ")"
         | "(" APPLICATION ")"
 
-ATOM -> id | num | UNARYOP | BINARYOP | TERNARYOP | "lambda" | "let" | "letrec"
+ATOM -> id | num
 
 LIST -> EXPR LIST
         | ε
 
-APPLICATION -> UNARYOP EXPR
+APPLICATION -> CONST 
+        | UNARYOP EXPR
         | BINARYOP EXPR EXPR
         | TERNARYOP EXPR EXPR EXPR
         | "lambda" "(" PARAMS ")" EXPR
         | "let" EXPR BINDINGS 
         | "letrec" EXPR BINDINGS 
 
-UNARYOP -> "quote" | "car" | "cdr" | "atom"
+CONST -> "quote" KEYWORD
+        | "quote" ATOM
+        | "quote" "(" CONSTS ")"
+
+CONSTS -> KEYWORD CONSTS
+        | ATOM CONSTS
+        | "(" CONSTS ")" CONSTS
+        | ε
+
+KEYWORD -> UNARYOP | BINARYOP | TERNARYOP | "quote" | "lambda" | "let" | "letrec"
+
+UNARYOP -> "car" | "cdr" | "atom"
 BINARYOP -> "add" | "sub" | "mul" | "dive" | "rem" | "le" | "cons" | "equal"
 TERNARYOP -> "cond"
 

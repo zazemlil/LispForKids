@@ -106,14 +106,15 @@ Node Emulator::evalCarNode(CarNode car, Matrix& n, Matrix& v) {
     
     if (auto nil = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(c)) {
         return nil;
-    } else if (c->getStatementCount() >= 1) {
+    } 
+    else {
         auto first = c->getStatement(0);
-        if (auto cons = std::dynamic_pointer_cast<syntax_tree::ListNode>(c)) {
+        if (auto list = std::dynamic_pointer_cast<syntax_tree::ListNode>(c)) {
             return first;
         }
     }
     
-    throw std::runtime_error("Car error!");
+    throw std::runtime_error("Car error: arg must be Nil or List");
 }
 
 Node Emulator::evalCdrNode(CdrNode cdr, Matrix& n, Matrix& v) {
@@ -121,27 +122,24 @@ Node Emulator::evalCdrNode(CdrNode cdr, Matrix& n, Matrix& v) {
     
     if (auto nil = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(c)) {
         return nil;
-    } else if (c->getStatementCount() >= 2) {
-        auto new_list = std::make_shared<syntax_tree::ListNode>("LIST");
-        for (size_t i = 1; i < c->getStatementCount(); ++i) {
-            new_list->addStatement(c->getStatement(i));
+    } else if (auto list = std::dynamic_pointer_cast<syntax_tree::ListNode>(c)) {
+        if (c->getStatementCount() >= 2) {
+            auto new_list = std::make_shared<syntax_tree::ListNode>("LIST");
+            for (size_t i = 1; i < c->getStatementCount(); ++i) {
+                new_list->addStatement(c->getStatement(i));
+            }
+            return new_list;
+        } else if (c->getStatementCount() == 1) {
+            return std::make_shared<syntax_tree::LiteralNil>("NIL");
         }
-        return new_list;
-    } else if (c->getStatementCount() == 1) {
-        return std::make_shared<syntax_tree::LiteralNil>("NIL");
     }
     
-    throw std::runtime_error("Cdr error!");
+    throw std::runtime_error("Cdr error: arg must be Nil or List");
 }
 
 Node Emulator::evalAtomNode(AtomNode atom, Matrix& n, Matrix& v) {
     auto arg = eval(atom->getStatement(0), n, v);
     
-    // если quote, то проверяем его агрумент на атомарность
-    auto quote = std::dynamic_pointer_cast<syntax_tree::QuoteNode>(arg);
-    if (quote) {
-        arg = quote->getStatement(0);
-    }
     // true, если аргумент атомарный (не список)
     bool is_atom = (std::dynamic_pointer_cast<syntax_tree::ListNode>(arg) == nullptr);
     
@@ -239,7 +237,7 @@ ListNode Emulator::evalConsNode(ConsNode cons, Matrix& n, Matrix& v) {
         return new_cons;
     }
     
-    throw std::runtime_error("Cons error!");
+    throw std::runtime_error("Cons error: second param must be List or Nil");
 }
 
 LiteralBool Emulator::evalEqualNode(EqualNode equal, Matrix& n, Matrix& v) {

@@ -28,17 +28,21 @@
     YY_DECL;
 }
 
-%token <std::string> T_IDENTIFIER
-%token <int> T_LITERAL_INT
+%nonassoc <std::string> T_IDENTIFIER
+%nonassoc <int> T_LITERAL_INT
+%nonassoc T_PARENTHESIS_OPEN T_PARENTHESIS_CLOSE
+%nonassoc T_END_OF_FILE
 
-%token T_PARENTHESIS_OPEN T_PARENTHESIS_CLOSE
+// Унарные операторы 
+%nonassoc <std::string> T_QUOTE T_CAR T_CDR T_ATOM
+// Бинарные операторы
+%nonassoc <std::string> T_CONS T_EQUAL T_ADD T_SUB T_MUL T_DIVE T_REM T_LE 
+// Тернарный оператор
+%nonassoc <std::string> T_COND
+// Специальные формы
+%nonassoc <std::string> T_LAMBDA T_LET T_LETREC 
 
-%token <std::string> T_QUOTE T_CAR T_CDR T_CONS T_ATOM T_EQUAL T_ADD 
-%token <std::string> T_SUB T_MUL T_DIVE T_REM T_LE T_COND T_LAMBDA T_LET T_LETREC 
-
-%token T_END_OF_FILE
-
-%type <std::shared_ptr<syntax_tree::ASTNode>> s expr atom list application unaryop binaryop ternaryop bind num id
+%type <std::shared_ptr<syntax_tree::ASTNode>> s expr atom list application const consts keyword unaryop binaryop ternaryop bind num id
 %type <std::vector<std::shared_ptr<syntax_tree::ASTNode>>> params bindings bindingsTail
 
 %%
@@ -55,13 +59,7 @@ expr: atom { $$ = $1; }
 
 
 atom: id { $$ = $1; }
-    | num { $$ = $1; }
-    | unaryop { $$ = $1; }
-    | binaryop { $$ = $1; }
-    | ternaryop { $$ = $1; }
-    | T_LET { $$ = std::make_shared<syntax_tree::LetNode>("LET"); }
-    | T_LETREC { $$ = std::make_shared<syntax_tree::LetrecNode>("LETREC"); };
-
+    | num { $$ = $1; };
 
 list: expr list {
         auto l = std::make_shared<syntax_tree::ListNode>("LIST");
@@ -72,7 +70,8 @@ list: expr list {
     | %empty { $$ = std::make_shared<syntax_tree::LiteralNil>("NIL"); };
     
 
-application: unaryop expr { $1->addStatement($2); $$ = $1; }
+application: const { $$ = $1; } 
+    | unaryop expr { $1->addStatement($2); $$ = $1; }
     | binaryop expr expr { $1->addStatement($2); $1->addStatement($3); $$ = $1; }
     | ternaryop expr expr expr { $1->addStatement($2); $1->addStatement($3); $1->addStatement($4); $$ = $1; }
     | T_LAMBDA T_PARENTHESIS_OPEN params T_PARENTHESIS_CLOSE expr {
@@ -95,8 +94,52 @@ application: unaryop expr { $1->addStatement($2); $$ = $1; }
     };
 
 
-unaryop: T_QUOTE { $$ = std::make_shared<syntax_tree::QuoteNode>("QUOTE"); }
-    | T_CAR { $$ = std::make_shared<syntax_tree::CarNode>("CAR"); }
+const: T_QUOTE keyword {
+        auto l = std::make_shared<syntax_tree::QuoteNode>("QUOTE");
+        l->addStatement($2);
+        $$ = l;
+    }
+    | T_QUOTE atom {
+        auto l = std::make_shared<syntax_tree::QuoteNode>("QUOTE");
+        l->addStatement($2);
+        $$ = l;
+    }
+    | T_QUOTE T_PARENTHESIS_OPEN consts T_PARENTHESIS_CLOSE {
+        auto l = std::make_shared<syntax_tree::QuoteNode>("QUOTE");
+        l->addStatement($3);
+        $$ = l;
+    };
+
+consts: keyword consts {
+        auto l = std::make_shared<syntax_tree::ListNode>("LIST");
+        l->addStatement($1);
+        l->addStatements($2->getStatements());
+        $$ = l;
+    }
+    | atom consts {
+        auto l = std::make_shared<syntax_tree::ListNode>("LIST");
+        l->addStatement($1);
+        l->addStatements($2->getStatements());
+        $$ = l;
+    }
+    | T_PARENTHESIS_OPEN consts T_PARENTHESIS_CLOSE consts {
+        auto l = std::make_shared<syntax_tree::ListNode>("LIST");
+        l->addStatement($2);
+        l->addStatements($4->getStatements());
+        $$ = l;
+    }
+    | %empty { $$ = std::make_shared<syntax_tree::LiteralNil>("NIL"); };
+
+keyword: unaryop { $$ = $1; }
+    | binaryop { $$ = $1; }
+    | ternaryop { $$ = $1; }
+    | T_QUOTE { $$ = std::make_shared<syntax_tree::QuoteNode>("QUOTE"); }
+    | T_LAMBDA { $$ = std::make_shared<syntax_tree::LambdaNode>("LAMBDA"); }
+    | T_LET { $$ = std::make_shared<syntax_tree::LetNode>("LET"); }
+    | T_LETREC { $$ = std::make_shared<syntax_tree::LetrecNode>("LETREC"); };
+
+
+unaryop: T_CAR { $$ = std::make_shared<syntax_tree::CarNode>("CAR"); }
     | T_CDR { $$ = std::make_shared<syntax_tree::CdrNode>("CDR"); }
     | T_ATOM { $$ = std::make_shared<syntax_tree::AtomNode>("ATOM"); };
 
