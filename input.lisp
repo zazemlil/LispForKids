@@ -1,6 +1,6 @@
 (letrec
     (COMPILE (quote 
-        (ADD x y) # компилируемая программа (нужно добавить isLiteral в COMP)
+        (ADD (ADD x y) 2) # компилируемая программа (Внимание! Не проверяется синтаксически.)
     ))
     (COMPILE (
         lambda (E) (
@@ -8,15 +8,17 @@
         )
     ))
     (COMP (
-        lambda (E N C) 
+        lambda (E N C)
+            (cond (LITERAL E)
+                (CONS (QUOTE LDC) (CONS E C))
             (cond (ATOM E) 
                 (CONS (QUOTE LD) (CONS (LOCATION E N) C))
             (cond (EQUAL (CAR E) (QUOTE QUOTE))
                 (CONS (QUOTE LDC) (CONS (CAR (CDR E)) C))
             (cond (EQUAL (CAR E) (QUOTE ADD))
                 (COMP (CAR (CDR E)) N (COMP (CAR (CDR (CDR E))) N (CONS (QUOTE ADD) C)))
-                (QUOTE -12345))
-        ))
+                (QUOTE -12345)
+        ))))
     ))
     (LOCATION (LAMBDA (E1 N1)
         (LETREC
