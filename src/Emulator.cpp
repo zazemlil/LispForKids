@@ -107,7 +107,7 @@ Node Emulator::evalCarNode(CarNode car, Matrix& n, Matrix& v) {
     if (auto nil = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(c)) {
         return nil;
     } 
-    else {
+    else if (c->getStatementCount() >= 1) {
         auto first = c->getStatement(0);
         if (auto list = std::dynamic_pointer_cast<syntax_tree::ListNode>(c)) {
             return first;
@@ -253,6 +253,9 @@ LiteralBool Emulator::evalEqualNode(EqualNode equal, Matrix& n, Matrix& v) {
                 if (left_lit->getValue() == right_lit->getValue()) {
                     return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", true);
                 }
+                else {
+                    return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", false);
+                }
             }
         }
         if (auto left_lit = std::dynamic_pointer_cast<syntax_tree::LiteralBool>(left)) {
@@ -260,11 +263,9 @@ LiteralBool Emulator::evalEqualNode(EqualNode equal, Matrix& n, Matrix& v) {
                 if (left_lit->getValue() == right_lit->getValue()) {
                     return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", true);
                 }
-            }
-        }
-        if (auto left_lit = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(left)) {
-            if (auto right_lit = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(right)) {
-                return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", true);
+                else {
+                    return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", false);
+                }
             }
         }
         if (auto left_lit = std::dynamic_pointer_cast<syntax_tree::Identifier>(left)) {
@@ -272,7 +273,13 @@ LiteralBool Emulator::evalEqualNode(EqualNode equal, Matrix& n, Matrix& v) {
                 if (left_lit->getValue() == right_lit->getValue()) {
                     return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", true);
                 }
+                else {
+                    return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", false);
+                }
             }
+        }
+        if (left->getNodeType() == right->getNodeType()) {
+            return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", true);
         }
         return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", false);
     }
