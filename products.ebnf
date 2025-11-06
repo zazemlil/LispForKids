@@ -28,7 +28,7 @@ CONSTS -> KEYWORD CONSTS
 
 KEYWORD -> UNARYOP | BINARYOP | TERNARYOP | "quote" | "lambda" | "let" | "letrec"
 
-UNARYOP -> "car" | "cdr" | "atom"
+UNARYOP -> "car" | "cdr" | "atom" | "literal"
 BINARYOP -> "add" | "sub" | "mul" | "dive" | "rem" | "le" | "cons" | "equal"
 TERNARYOP -> "cond"
 

@@ -108,6 +108,7 @@ class QuoteNode : public ASTNode { public: QuoteNode(std::string t) : ASTNode(t)
 class CarNode : public ASTNode { public: CarNode(std::string t) : ASTNode(t) {} };
 class CdrNode : public ASTNode { public: CdrNode(std::string t) : ASTNode(t) {} };
 class AtomNode : public ASTNode { public: AtomNode(std::string t) : ASTNode(t) {} };
+class LiteralNode : public ASTNode { public: LiteralNode(std::string t) : ASTNode(t) {} };
 
 // binary
 class AddNode : public ASTNode { public: AddNode(std::string t) : ASTNode(t) {} };

@@ -35,7 +35,7 @@
 %nonassoc T_END_OF_FILE
 
 // Унарные операторы 
-%nonassoc <std::string> T_QUOTE T_CAR T_CDR T_ATOM
+%nonassoc <std::string> T_QUOTE T_CAR T_CDR T_ATOM T_LITERAL
 // Бинарные операторы
 %nonassoc <std::string> T_CONS T_EQUAL T_ADD T_SUB T_MUL T_DIVE T_REM T_LE 
 // Тернарный оператор
@@ -145,7 +145,8 @@ keyword: unaryop { $$ = $1; }
 
 unaryop: T_CAR { $$ = std::make_shared<syntax_tree::CarNode>("CAR"); }
     | T_CDR { $$ = std::make_shared<syntax_tree::CdrNode>("CDR"); }
-    | T_ATOM { $$ = std::make_shared<syntax_tree::AtomNode>("ATOM"); };
+    | T_ATOM { $$ = std::make_shared<syntax_tree::AtomNode>("ATOM"); }
+    | T_LITERAL { $$ = std::make_shared<syntax_tree::LiteralNode>("LITERAL");};
 
 
 binaryop: T_ADD { $$ = std::make_shared<syntax_tree::AddNode>("ADD"); }

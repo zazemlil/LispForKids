@@ -14,6 +14,7 @@ typedef std::shared_ptr<syntax_tree::QuoteNode> QuoteNode;
 typedef std::shared_ptr<syntax_tree::CarNode> CarNode;
 typedef std::shared_ptr<syntax_tree::CdrNode> CdrNode;
 typedef std::shared_ptr<syntax_tree::AtomNode> AtomNode;
+typedef std::shared_ptr<syntax_tree::LiteralNode> LiteralNode;
 typedef std::shared_ptr<syntax_tree::AddNode> AddNode;
 typedef std::shared_ptr<syntax_tree::SubNode> SubNode;
 typedef std::shared_ptr<syntax_tree::MulNode> MulNode;
@@ -42,6 +43,7 @@ private:
     Node evalCarNode(CarNode car, Matrix& n, Matrix& v);
     Node evalCdrNode(CdrNode cdr, Matrix& n, Matrix& v);
     Node evalAtomNode(AtomNode atom, Matrix& n, Matrix& v);
+    Node evalLiteralNode(LiteralNode literal, Matrix& n, Matrix& v);
 
     // binary
     LiteralInt evalAddNode(AddNode add, Matrix& n, Matrix& v);

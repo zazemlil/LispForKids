@@ -38,6 +38,9 @@ Node Emulator::eval(Node e, Matrix& n, Matrix& v) {
     else if (auto atom = std::dynamic_pointer_cast<syntax_tree::AtomNode>(e)) {
         return evalAtomNode(atom, n, v);
     }
+    else if (auto literal = std::dynamic_pointer_cast<syntax_tree::LiteralNode>(e)) {
+        return evalLiteralNode(literal, n, v);
+    }
     else if (auto add = std::dynamic_pointer_cast<syntax_tree::AddNode>(e)) {
         return evalAddNode(add, n, v);
     }
@@ -144,6 +147,22 @@ Node Emulator::evalAtomNode(AtomNode atom, Matrix& n, Matrix& v) {
     bool is_atom = (std::dynamic_pointer_cast<syntax_tree::ListNode>(arg) == nullptr);
     
     return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", is_atom);
+}
+
+Node Emulator::evalLiteralNode(LiteralNode literal, Matrix& n, Matrix& v) {
+    auto arg = eval(literal->getStatement(0), n, v);
+    bool isLiteral = false;
+
+    if (auto lit_int = std::dynamic_pointer_cast<syntax_tree::LiteralInt>(arg)) {
+        isLiteral = true;
+    }
+    else if (auto lit_bool = std::dynamic_pointer_cast<syntax_tree::LiteralBool>(arg)) {
+        isLiteral = true;
+    }
+    else if (auto lit_nil = std::dynamic_pointer_cast<syntax_tree::LiteralNil>(arg)) {
+        isLiteral = true;
+    }
+    return std::make_shared<syntax_tree::LiteralBool>("LiteralBool", isLiteral);
 }
 
 LiteralInt Emulator::evalAddNode(AddNode add, Matrix& n, Matrix& v) {

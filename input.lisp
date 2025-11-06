@@ -4,7 +4,7 @@
     ))
     (COMPILE (
         lambda (E) (
-            COMP E (quote ((x y))) (quote Nil)
+            COMP E (quote ((x y))) (quote Nil) # тестовое окружение ((x y))
         )
     ))
     (COMP (
