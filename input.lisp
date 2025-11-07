@@ -4,7 +4,7 @@
     ))
 
     (COMPILE (LAMBDA (E) (
-            COMP E (QUOTE ((x y))) (QUOTE Nil) # тестовое окружение ((x y))
+            COMP E (QUOTE ((x y))) (QUOTE (STOP)) # тестовое окружение ((x y))
         )
     ))
     (COMP (LAMBDA (E N C)
@@ -40,7 +40,7 @@
                 (LET (COMP (CAR (CDR E)) N (CONS (QUOTE SEL) (CONS THENPT (CONS ELSEPT C))))
                 (THENPT (COMP (CAR (CDR (CDR E))) N (QUOTE (JOIN))))
                 (ELSEPT (COMP (CAR (CDR (CDR (CDR E)))) N (QUOTE (JOIN)))))
-            (cond (EQUAL (CAR E) (QUOTE LAMBDA))
+            (COND (EQUAL (CAR E) (QUOTE LAMBDA))
                 (LET (CONS (QUOTE LDF) (CONS BODY C))
                     (BODY (COMP (CAR (CDR (CDR E))) (CONS (CAR (CDR E)) N) (QUOTE (RTN)))))
             (QUOTE -12345)
