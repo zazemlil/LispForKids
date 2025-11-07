@@ -1,6 +1,6 @@
 (letrec
     (COMPILE (quote 
-        (ADD (SUB x y) 2) # компилируемая программа (Внимание! Не проверяется синтаксически.)
+        (ADD (SUB x y) (COND (equal 1 3) 123 -123)) # компилируемая программа (Внимание! Не проверяется синтаксически.)
     ))
     (COMPILE (
         lambda (E) (
@@ -37,8 +37,12 @@
                 (COMP (CAR (CDR E)) N (CONS (QUOTE ATOM) C))
             (cond (EQUAL (CAR E) (QUOTE CONS))
                 (COMP (CAR (CDR (CDR E))) N (COMP (CAR (CDR E)) N (CONS (QUOTE CONS) C)))
-                (QUOTE -12345)
-        ))))))))))))))
+            (cond (EQUAL (CAR E) (QUOTE COND))
+                (LET (COMP (CAR (CDR E)) N (CONS (QUOTE SEL) (CONS THENPT (CONS ELSEPT C))))
+                (THENPT (COMP (CAR (CDR (CDR E))) N (QUOTE (JOIN))))
+                (ELSEPT (COMP (CAR (CDR (CDR (CDR E)))) N (QUOTE (JOIN)))))
+            (QUOTE -12345)
+        )))))))))))))))
     ))
     (LOCATION (LAMBDA (E1 N1)
         (LETREC
