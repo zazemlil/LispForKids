@@ -1,10 +1,19 @@
 (LETREC
     (COMPILE (QUOTE 
-        (f 1 2) # компилируемая программа (Внимание! Не проверяется синтаксически и семантически.)
+        # компилируемая программа (Внимание! Не проверяется синтаксически и семантически.)
+        #(let (mul a b) (a (add 5 1)) (b 2))
+        (letrec (f 5) (
+            f (lambda (x) 
+                (cond (EQUAL x 0)
+                    (quote 1)
+                    (mul x (f (sub x 1))))
+            )
+        ))
+        
     ))
 
     (COMPILE (LAMBDA (E) (
-            COMP E (QUOTE ((f x y))) (QUOTE (STOP)) # тестовое окружение ((x y))
+            COMP E (QUOTE NIL) (QUOTE (STOP)) # тестовое окружение ((x y))
         )
     ))
     (COMP (LAMBDA (E N C)
@@ -43,8 +52,24 @@
             (COND (EQUAL (CAR E) (QUOTE LAMBDA))
                 (LET (CONS (QUOTE LDF) (CONS BODY C))
                     (BODY (COMP (CAR (CDR (CDR E))) (CONS (CAR (CDR E)) N) (QUOTE (RTN)))))
+            (COND (EQUAL (CAR E) (QUOTE LET))
+                (LET 
+                    (LET 
+                        (COMPLIS ARGS N (CONS (QUOTE LDF) (CONS BODY (CONS (QUOTE AP) C))))
+                        (BODY (COMP (CAR (CDR E)) M (QUOTE (RTN))))
+                    )
+                    (M (CONS (VARS (CDR (CDR E))) N))
+                    (ARGS (EXPRS (CDR (CDR E)))))
+            (COND (EQUAL (CAR E) (QUOTE LETREC))
+                (LET  
+                    (LET  
+                        (CONS (QUOTE DUM) (COMPLIS ARGS M (CONS (QUOTE LDF) (CONS BODY (CONS (QUOTE RAP) C)))))
+                        (BODY (COMP (CAR (CDR E)) M (QUOTE (RTN))))
+                    )
+                    (M (CONS (VARS (CDR (CDR E))) N))
+                    (ARGS (EXPRS (CDR (CDR E)))))
             (COMPLIS (CDR E) N (COMP (CAR E) N (CONS (QUOTE AP) C)))
-        ))))))))))))))))
+        ))))))))))))))))))
     ))
     (COMPLIS (LAMBDA (E N C) # представляет список в виде CONS`ов
         (COND (EQUAL E (QUOTE NIL)) 
@@ -67,5 +92,13 @@
             (INCAR (LAMBDA (L) 
                 (CONS (ADD (QUOTE 1) (CAR L)) (CDR L))))
         ))
+    )
+    (VARS (LAMBDA (D)
+        (cond (EQUAL D (QUOTE NIL)) (QUOTE NIL)
+            (CONS (CAR (CAR D)) (VARS (CDR D)))))
+    )
+    (EXPRS (LAMBDA (D)
+        (cond (EQUAL D (QUOTE NIL)) (QUOTE NIL)
+            (CONS (CAR (CDR (CAR D))) (EXPRS (CDR D))))) # было (CONS (CDR (CAR D)) (EXPRS (CDR D)))
     )
 )
