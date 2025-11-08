@@ -1,14 +1,14 @@
 (LETREC
     (COMPILE (QUOTE 
-        (LAMBDA (a b) (add a 2)) # компилируемая программа (Внимание! Не проверяется синтаксически и семантически.)
+        (f 1 2) # компилируемая программа (Внимание! Не проверяется синтаксически и семантически.)
     ))
 
     (COMPILE (LAMBDA (E) (
-            COMP E (QUOTE ((x y))) (QUOTE (STOP)) # тестовое окружение ((x y))
+            COMP E (QUOTE ((f x y))) (QUOTE (STOP)) # тестовое окружение ((x y))
         )
     ))
     (COMP (LAMBDA (E N C)
-            (COND (LITERAL E)
+            (COND (LITERAL E) # проверка нужна, что бы использовать литералы напрямую (без quote) 
                 (CONS (QUOTE LDC) (CONS E C))
             (COND (ATOM E) # символьный атом, т.к. не литерал
                 (CONS (QUOTE LD) (CONS (LOCATION E N) C))
@@ -43,9 +43,15 @@
             (COND (EQUAL (CAR E) (QUOTE LAMBDA))
                 (LET (CONS (QUOTE LDF) (CONS BODY C))
                     (BODY (COMP (CAR (CDR (CDR E))) (CONS (CAR (CDR E)) N) (QUOTE (RTN)))))
-            (QUOTE -12345)
+            (COMPLIS (CDR E) N (COMP (CAR E) N (CONS (QUOTE AP) C)))
         ))))))))))))))))
     ))
+    (COMPLIS (LAMBDA (E N C) # представляет список в виде CONS`ов
+        (COND (EQUAL E (QUOTE NIL)) 
+            (CONS (QUOTE LDC) (CONS (QUOTE NIL) C))
+            (COMPLIS (CDR E) N (COMP (CAR E) N (CONS (QUOTE CONS) C)))
+        ))
+    )
     (LOCATION (LAMBDA (E1 N1)
         (LETREC
             (cond (MEMBER E1 (CAR N1)) 
