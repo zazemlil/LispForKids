@@ -1,25 +1,23 @@
 (LETREC
     (COMPILE (QUOTE 
-        # компилируемая программа (Внимание! Не проверяется синтаксически и семантически.)
-        #(let (mul a b) (a (add 5 1)) (b 2))
+        ; компилируемая программа (Внимание! Не проверяется синтаксически и семантически.)
+        ;(let (mul a b) (a (add 5 1)) (b 2))
         (letrec (f 5) (
             f (lambda (x) 
-                (cond (EQUAL x 0)
-                    (quote 1)
-                    (mul x (f (sub x 1))))
+                (cond (EQUAL x 0) (quote 1) (mul x (f (sub x 1))))
             )
         ))
         
     ))
 
     (COMPILE (LAMBDA (E) (
-            COMP E (QUOTE NIL) (QUOTE (STOP)) # тестовое окружение ((x y))
+            COMP E (QUOTE NIL) (QUOTE (STOP)) ; тестовое окружение ((x y))
         )
     ))
     (COMP (LAMBDA (E N C)
-            (COND (LITERAL E) # проверка нужна, что бы использовать литералы напрямую (без quote) 
+            (COND (LITERAL E) ; проверка нужна, что бы использовать литералы напрямую (без quote) 
                 (CONS (QUOTE LDC) (CONS E C))
-            (COND (ATOM E) # символьный атом, т.к. не литерал
+            (COND (ATOM E) ; символьный атом, т.к. не литерал
                 (CONS (QUOTE LD) (CONS (LOCATION E N) C))
             (COND (EQUAL (CAR E) (QUOTE QUOTE))
                 (CONS (QUOTE LDC) (CONS (CAR (CDR E)) C))
@@ -71,7 +69,7 @@
             (COMPLIS (CDR E) N (COMP (CAR E) N (CONS (QUOTE AP) C)))
         ))))))))))))))))))
     ))
-    (COMPLIS (LAMBDA (E N C) # представляет список в виде CONS`ов
+    (COMPLIS (LAMBDA (E N C) ; представляет список в виде CONS`ов
         (COND (EQUAL E (QUOTE NIL)) 
             (CONS (QUOTE LDC) (CONS (QUOTE NIL) C))
             (COMPLIS (CDR E) N (COMP (CAR E) N (CONS (QUOTE CONS) C)))
@@ -99,6 +97,6 @@
     )
     (EXPRS (LAMBDA (D)
         (cond (EQUAL D (QUOTE NIL)) (QUOTE NIL)
-            (CONS (CAR (CDR (CAR D))) (EXPRS (CDR D))))) # было (CONS (CDR (CAR D)) (EXPRS (CDR D)))
+            (CONS (CAR (CDR (CAR D))) (EXPRS (CDR D))))) ; было (CONS (CDR (CAR D)) (EXPRS (CDR D)))
     )
 )

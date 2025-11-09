@@ -26,7 +26,7 @@ static int current_column = 1;
 
 %%
 
-#.*                          { /* ignore comment */ }
+;.*                          { /* ignore comment */ }
 [qQ][uU][oO][tT][eE]         { yylval->emplace<std::string>("QUOTE"); return Parser::token::T_QUOTE; }
 [cC][aA][rR]                 { yylval->emplace<std::string>("CAR"); return Parser::token::T_CAR; }
 [cC][dD][rR]                 { yylval->emplace<std::string>("CDR"); return Parser::token::T_CDR; }
