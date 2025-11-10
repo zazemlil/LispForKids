@@ -74,8 +74,8 @@ void set_input_file(yyscan_t scanner, const char* filename) {
 }
 
 syntax_tree::AST analize(int argc, char* argv[]) {
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <input_file>" << std::endl;
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <input_file> [<output_file>]" << std::endl;
         return syntax_tree::AST();
     }
     

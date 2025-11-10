@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <fstream>
 
 namespace syntax_tree {
 
@@ -33,7 +34,7 @@ public:
         );
     }
 
-    virtual void printValue() const { std::cout << node_type; }
+    virtual void printValue(std::ostream& os = std::cout) const { os << node_type; }
 
     void printRec(int deep, int maxDeep, int indent = 0) const {
         std::string indentStr = ""; 
@@ -49,32 +50,32 @@ public:
         }
     }
 
-    void print(int indent = 0) const {
+    void print(int indent = 0, std::ostream& os = std::cout) const {
         std::string indentStr = ""; 
         for (int i = 0; i < indent-1; i++) {indentStr += "    ";} 
         
-        std::cout << indentStr << "";
-        this->printValue();
-        std::cout << '\n';
+        os << indentStr << "";
+        this->printValue(os);
+        os << '\n';
         
         for (const auto& stmt : statements) {
-            stmt->print(indent + 2);
+            stmt->print(indent + 2, os);
         }
     }
 
-    virtual void printFlat(int depth = 0) {
+    virtual void printFlat(int depth = 0, std::ostream& os = std::cout) {
         if (!statements.empty()) {
-            std::cout << "(";
+            os << "(";
         }
         
-        printValue();
+        printValue(os);
         
         if (!statements.empty()) {
             for (const auto& stmt : statements) {
-                std::cout << " ";
-                stmt->printFlat(depth + 1);
+                os << " ";
+                stmt->printFlat(depth + 1, os);
             }
-            std::cout << ")";
+            os << ")";
         }
     }
 };
@@ -91,10 +92,10 @@ public:
     std::shared_ptr<ASTNode> getRoot() { return root; }
     bool isEmpty() const { return root == nullptr; }
 
-    void print(bool flat = false) const {
+    void print(bool flat = false, std::ostream& os = std::cout) const {
         if (root) {
             if (!flat) root->print(0);
-            else root->printFlat();
+            else root->printFlat(0, os);
             std::cout << "\n";
         } else {
             std::cout << "AST is empty.\n\n";
@@ -128,15 +129,15 @@ class LambdaNode : public ASTNode { public: LambdaNode(std::string t) : ASTNode(
 class FuncClosureNode : public ASTNode { 
 public: 
     FuncClosureNode(std::string t) : ASTNode(t) {} 
-    void printFlat(int depth = 0) override {
-        std::cout << "(";
+    void printFlat(int depth = 0, std::ostream& os = std::cout) override {
+        os << "(";
         if (!getStatements().empty()) {
             for (const auto& stmt : getStatements()) {
-                std::cout << " ";
-                stmt->printFlat(depth);
+                os << " ";
+                stmt->printFlat(depth, os);
             }
         }
-        std::cout << ")";
+        os << ")";
     }
 };
 class LetNode : public ASTNode { public: LetNode(std::string t) : ASTNode(t) {} };
@@ -146,7 +147,7 @@ class LetrecNode : public ASTNode { public: LetrecNode(std::string t) : ASTNode(
 class LiteralInt : public ASTNode {
     int value;
 public:
-    void printValue() const override { std::cout << value; }
+    void printValue(std::ostream& os = std::cout) const override { os << value; }
     int getValue() { return value; }
     LiteralInt(std::string t, int v) : ASTNode(t), value(v) {}
 };
@@ -154,9 +155,9 @@ public:
 class LiteralBool : public ASTNode {
     bool value;
 public:
-    void printValue() const override {
-        if (value) { std::cout << "TRUE"; }
-        else { std::cout << "FALSE"; }
+    void printValue(std::ostream& os = std::cout) const override {
+        if (value) { os << "TRUE"; }
+        else { os << "FALSE"; }
     }
     bool getValue() { return value; }
     LiteralBool(std::string t, bool v) : ASTNode(t), value(v) {}
@@ -165,15 +166,15 @@ public:
 class ListNode : public ASTNode { 
 public: 
     ListNode(std::string t) : ASTNode(t) {}
-    void printFlat(int depth = 0) override {
-        std::cout << "(";
+    void printFlat(int depth = 0, std::ostream& os = std::cout) override {
+        os << "(";
         if (!getStatements().empty()) {
             for (const auto& stmt : getStatements()) {
-                std::cout << " ";
-                stmt->printFlat(depth);
+                os << " ";
+                stmt->printFlat(depth, os);
             }
         }
-        std::cout << ")";
+        os << ")";
     }
 };
 
@@ -182,7 +183,7 @@ class LiteralNil : public ASTNode { public: LiteralNil(std::string t) : ASTNode(
 class Identifier : public ASTNode {
     std::string value;
 public:
-    void printValue() const override { std::cout << value; }
+    void printValue(std::ostream& os = std::cout) const override { os << value; }
     std::string getValue() { return value; }
     Identifier(std::string t, std::string v) : ASTNode(t), value(v) {}
 };

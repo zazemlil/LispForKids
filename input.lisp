@@ -1,13 +1,7 @@
 (LETREC
     (COMPILE (QUOTE 
         ; компилируемая программа (Внимание! Не проверяется синтаксически и семантически.)
-        ;(let (mul a b) (a (add 5 1)) (b 2))
-        (letrec (f 5) (
-            f (lambda (x) 
-                (cond (EQUAL x 0) (quote 1) (mul x (f (sub x 1))))
-            )
-        ))
-        
+        (let (mul a b) (a (add 5 1)) (b 2))
     ))
 
     (COMPILE (LAMBDA (E) (
