@@ -1,6 +1,6 @@
 # LispForKids
 
-C++ translator of LispKit subset with flex & bison.
+C++ implementation of LispKit emulator with flex & bison.
 
 ## Requirements
 
