@@ -29,7 +29,7 @@
 }
 
 %nonassoc <std::string> T_IDENTIFIER
-%nonassoc <int> T_LITERAL_INT
+%nonassoc <std::string> T_LITERAL_INT
 %nonassoc T_LITERAL_NIL T_LITERAL_TRUE T_LITERAL_FALSE
 %nonassoc T_PARENTHESIS_OPEN T_PARENTHESIS_CLOSE
 %nonassoc T_END_OF_FILE
@@ -184,7 +184,7 @@ bind: T_PARENTHESIS_OPEN id expr T_PARENTHESIS_CLOSE {
     $$ = b;
 };
 
-num: T_LITERAL_INT { $$ = std::make_shared<syntax_tree::LiteralInt>("LiteralInt", $1); };
+num: T_LITERAL_INT { $$ = std::make_shared<syntax_tree::LiteralInt>("LiteralInt", cBigNumber($1.c_str(), 10)); };
 id: T_IDENTIFIER { $$ = std::make_shared<syntax_tree::Identifier>("Identifier", $1); };
 
 %%

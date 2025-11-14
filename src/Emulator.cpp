@@ -207,7 +207,7 @@ LiteralInt Emulator::evalDiveNode(DiveNode dive, Matrix& n, Matrix& v) {
 
     if (auto left_lit = std::dynamic_pointer_cast<syntax_tree::LiteralInt>(left)) {
         if (auto right_lit = std::dynamic_pointer_cast<syntax_tree::LiteralInt>(right)) {
-            return std::make_shared<syntax_tree::LiteralInt>("LiteralInt", (int)left_lit->getValue() / right_lit->getValue());
+            return std::make_shared<syntax_tree::LiteralInt>("LiteralInt", left_lit->getValue() / right_lit->getValue());
         }
     }
     throw std::runtime_error("Dive operation requires integer operands");

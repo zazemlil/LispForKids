@@ -5,6 +5,9 @@
 #include <iostream>
 #include <fstream>
 
+#include "cBigNumber/Cbignum.h"
+#include "cBigNumber/Cbignums.h"
+
 namespace syntax_tree {
 
 class ASTNode {
@@ -145,11 +148,11 @@ class LetrecNode : public ASTNode { public: LetrecNode(std::string t) : ASTNode(
 
 
 class LiteralInt : public ASTNode {
-    int value;
+    cBigNumber value;
 public:
     void printValue(std::ostream& os = std::cout) const override { os << value; }
-    int getValue() { return value; }
-    LiteralInt(std::string t, int v) : ASTNode(t), value(v) {}
+    cBigNumber getValue() { return value; }
+    LiteralInt(std::string t, cBigNumber v) : ASTNode(t), value(v) {}
 };
 
 class LiteralBool : public ASTNode {

@@ -52,7 +52,7 @@ static int current_column = 1;
 ")" { return Parser::token::T_PARENTHESIS_CLOSE; }
 
 [a-zA-z][a-zA-z|0-9]* { yylval->emplace<std::string>(std::string(yytext, yyleng)); return Parser::token::T_IDENTIFIER; }
-[-]?[0-9]+ { yylval->emplace<int>(atoi(yytext)); return Parser::token::T_LITERAL_INT; }
+[-]?[0-9]+ { yylval->emplace<std::string>(std::string(yytext, yyleng)); return Parser::token::T_LITERAL_INT; }
 
 \n { current_line++; current_column = 1; }
 \r { current_column = 1; }
